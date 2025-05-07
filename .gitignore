@@ -1,0 +1,15 @@
+# Logs
+logs/
+
+# Environment variables
+.env
+
+# GCP include folder
+include/gcp/
+
+include/dataset/
+
+# Specific configuration file
+include/soda/edw_loaded/configuration.yml
+include/soda/edw_cleaned/configuration.yml
+include/soda/edw/configuration.yml

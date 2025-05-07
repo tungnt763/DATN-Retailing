@@ -1,0 +1,4 @@
+Set up Airflow:
+mkdir dags logs plugins
+docker compose up airflow-init
+docker compose up -d

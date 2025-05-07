@@ -1,0 +1,75 @@
+checks for transactions_temp:
+- schema:
+    fail:
+      when required column missing:
+      - trn_invc_id
+      - trn_line
+      - trn_cstmr_id
+      - trn_prd_id
+      - trn_qty
+      - trn_date
+      - trn_str_id
+      - trn_emply_id
+      when wrong column type:
+        trn_invc_id: string
+        trn_line: string
+        trn_cstmr_id: string
+        trn_prd_id: string
+        trn_sz: string
+        trn_cl: string
+        trn_unit_prc: string
+        trn_qty: string
+        trn_date: string
+        trn_dscnt: string
+        trn_line_ttl: string
+        trn_str_id: string
+        trn_emply_id: string
+        trn_crncy: string
+        trn_crncy_sbl: string
+        trn_sku: string
+        trn_type: string
+        trn_pymnt_mthd: string
+        trn_invc_ttl: string
+- row_count > 0:
+    name: Transactions table contains data
+- failed rows:
+    name: Column count must be 19
+    fail query: |-
+      SELECT COUNT(*) AS col_count
+      FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
+      WHERE table_name = 'transactions_temp'
+      HAVING col_count != 19
+- missing_count(trn_invc_id) = 0:
+    name: Invoice ID is required
+- missing_count(trn_line) = 0:
+    name: Line is required
+- missing_count(trn_cstmr_id) = 0:
+    name: Customer ID is required
+- missing_count(trn_prd_id) = 0:
+    name: Product ID is required
+- missing_count(trn_qty) = 0:
+    name: Quantity is required
+- missing_count(trn_date) = 0:
+    name: Date is required
+- missing_count(trn_str_id) = 0:
+    name: Store ID is required
+- missing_count(trn_emply_id) = 0:
+    name: Employee ID is required
+- invalid_count(trn_unit_prc) = 0:
+    name: Unit Price format validation
+    valid format: positive decimal point
+- invalid_count(trn_qty) = 0:
+    name: Quantity format validation
+    valid format: positive integer
+- invalid_count(trn_line_ttl) = 0:
+    name: Line Total format validation
+    valid format: positive decimal point
+- invalid_count(trn_invc_ttl) = 0:
+    name: Invoice Total format validation
+    valid format: positive decimal point
+- invalid_count(trn_date) = 0:
+    name: Date regex validation
+    valid regex: ^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])\s([01]\d|2[0-3])-[0-5]\d-[0-5]\d$
+- invalid_count(trn_dscnt) = 0:
+    name: Discount regex validation
+    valid regex: ^0(\.\d+)?$|^1(\.0+)?$

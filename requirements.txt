@@ -1,0 +1,2 @@
+apache-airflow-providers-google==10.3.0
+soda-core-bigquery==3.0.45

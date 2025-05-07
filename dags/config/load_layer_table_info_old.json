@@ -1,0 +1,400 @@
+{
+    "customers": {
+      "physical_name": "customers",
+      "logical_name_en": "Customers",
+      "col_nums": "9",
+      "filter": "",
+      "columns": [
+        {
+          "logical_name_en": "Customer ID",
+          "physical_name": "cstmr_id",
+          "type": "STRING",
+          "index": "1",
+          "pk": "Y",
+          "mode": "REQUIRED",
+          "format": "",
+          "min": "",
+          "max": "",
+          "values": [],
+          "regax": ""
+        },
+        {
+          "logical_name_en": "Name",
+          "physical_name": "cstmr_name",
+          "type": "STRING",
+          "index": "2"
+        },
+        {
+          "logical_name_en": "Email",
+          "physical_name": "cstmr_email",
+          "type": "STRING",
+          "index": "3"
+        },
+        {
+          "logical_name_en": "Telephone",
+          "physical_name": "cstmr_tel",
+          "type": "STRING",
+          "index": "4"
+        },
+        {
+          "logical_name_en": "City",
+          "physical_name": "cstmr_city",
+          "type": "STRING",
+          "index": "5"
+        },
+        {
+          "logical_name_en": "Country",
+          "physical_name": "cstmr_cntry",
+          "type": "STRING",
+          "index": "6"
+        },
+        {
+          "logical_name_en": "Gender",
+          "physical_name": "cstmr_gender",
+          "type": "STRING",
+          "index": "7"
+        },
+        {
+          "logical_name_en": "Date of Birth",
+          "physical_name": "cstmr_birthdate",
+          "type": "STRING",
+          "index": "8"
+        },
+        {
+          "logical_name_en": "Job Title",
+          "physical_name": "cstmr_job_title",
+          "type": "STRING",
+          "index": "9"
+        }
+      ]
+    },
+    "discounts": {
+      "physical_name": "discounts",
+      "logical_name_en": "Discounts",
+      "col_nums": "6",
+      "columns": [
+        {
+          "logical_name_en": "Start Date",
+          "physical_name": "dscnt_start_date",
+          "type": "STRING",
+          "index": "1"
+        },
+        {
+          "logical_name_en": "End Date",
+          "physical_name": "dscnt_end_date",
+          "type": "STRING",
+          "index": "2"
+        },
+        {
+          "logical_name_en": "Discount",
+          "physical_name": "dscnt_value",
+          "type": "STRING",
+          "index": "3"
+        },
+        {
+          "logical_name_en": "Description",
+          "physical_name": "dscnt_desc",
+          "type": "STRING",
+          "index": "4"
+        },
+        {
+          "logical_name_en": "Category",
+          "physical_name": "dscnt_ctgry",
+          "type": "STRING",
+          "index": "5"
+        },
+        {
+          "logical_name_en": "Sub Category",
+          "physical_name": "dscnt_sub_ctgry",
+          "type": "STRING",
+          "index": "6"
+        }
+      ]
+    },
+    "employees": {
+      "physical_name": "employees",
+      "logical_name_en": "Employees",
+      "col_nums": "4",
+      "columns": [
+        {
+          "logical_name_en": "Employee ID",
+          "physical_name": "emply_id",
+          "type": "STRING",
+          "index": "1"
+        },
+        {
+          "logical_name_en": "Store ID",
+          "physical_name": "str_id",
+          "type": "INTEGER",
+          "index": "2"
+        },
+        {
+          "logical_name_en": "Name",
+          "physical_name": "emply_name",
+          "type": "STRING",
+          "index": "3"
+        },
+        {
+          "logical_name_en": "Position",
+          "physical_name": "emply_pstn",
+          "type": "STRING",
+          "index": "4"
+        }
+      ]
+    },
+    "products": {
+      "physical_name": "products",
+      "logical_name_en": "Products",
+      "col_nums": "12",
+      "columns": [
+        {
+          "logical_name_en": "Product ID",
+          "physical_name": "prd_id",
+          "type": "STRING",
+          "index": "1"
+        },
+        {
+          "logical_name_en": "Category",
+          "physical_name": "prd_ctgry",
+          "type": "STRING",
+          "index": "2"
+        },
+        {
+          "logical_name_en": "Sub Category",
+          "physical_name": "prd_sub_ctgry",
+          "type": "STRING",
+          "index": "3"
+        },
+        {
+          "logical_name_en": "Description PT",
+          "physical_name": "prd_desc_pt",
+          "type": "STRING",
+          "index": "4"
+        },
+        {
+          "logical_name_en": "Description DE",
+          "physical_name": "prd_desc_de",
+          "type": "STRING",
+          "index": "5"
+        },
+        {
+          "logical_name_en": "Description FR",
+          "physical_name": "prd_desc_fr",
+          "type": "STRING",
+          "index": "6"
+        },
+        {
+          "logical_name_en": "Description ES",
+          "physical_name": "prd_desc_es",
+          "type": "STRING",
+          "index": "7"
+        },
+        {
+          "logical_name_en": "Description EN",
+          "physical_name": "prd_desc_en",
+          "type": "STRING",
+          "index": "8"
+        },
+        {
+          "logical_name_en": "Description ZH",
+          "physical_name": "prd_desc_zh",
+          "type": "STRING",
+          "index": "9"
+        },
+        {
+          "logical_name_en": "Color",
+          "physical_name": "prd_color",
+          "type": "STRING",
+          "index": "10"
+        },
+        {
+          "logical_name_en": "Sizes",
+          "physical_name": "prd_sizes",
+          "type": "STRING",
+          "index": "11"
+        },
+        {
+          "logical_name_en": "Production Cost",
+          "physical_name": "prd_cost",
+          "type": "STRING",
+          "index": "12"
+        }
+      ]
+    },
+    "stores": {
+      "physical_name": "stores",
+      "logical_name_en": "Stores",
+      "col_nums": "8",
+      "columns": [
+        {
+          "logical_name_en": "Store ID",
+          "physical_name": "str_id",
+          "type": "STRING",
+          "index": "1"
+        },
+        {
+          "logical_name_en": "Country",
+          "physical_name": "str_cntry",
+          "type": "STRING",
+          "index": "2"
+        },
+        {
+          "logical_name_en": "City",
+          "physical_name": "str_city",
+          "type": "STRING",
+          "index": "3"
+        },
+        {
+          "logical_name_en": "Store Name",
+          "physical_name": "str_name",
+          "type": "STRING",
+          "index": "4"
+        },
+        {
+          "logical_name_en": "Number of Employees",
+          "physical_name": "str_emply_num",
+          "type": "STRING",
+          "index": "5"
+        },
+        {
+          "logical_name_en": "ZIP Code",
+          "physical_name": "str_zip_cd",
+          "type": "STRING",
+          "index": "6"
+        },
+        {
+          "logical_name_en": "Latitude",
+          "physical_name": "str_lat",
+          "type": "STRING",
+          "index": "7"
+        },
+        {
+          "logical_name_en": "Longitude",
+          "physical_name": "str_lon",
+          "type": "STRING",
+          "index": "8"
+        }
+      ]
+    },
+    "transactions": {
+      "physical_name": "transactions",
+      "logical_name_en": "Transactions",
+      "col_nums": "19",
+      "columns": [
+        {
+          "logical_name_en": "Invoice ID",
+          "physical_name": "trn_invc_id",
+          "type": "STRING",
+          "index": "1"
+        },
+        {
+          "logical_name_en": "Line",
+          "physical_name": "trn_line",
+          "type": "STRING",
+          "index": "2"
+        },
+        {
+          "logical_name_en": "Customer ID",
+          "physical_name": "cstmr_id",
+          "type": "STRING",
+          "index": "3"
+        },
+        {
+          "logical_name_en": "Product ID",
+          "physical_name": "trn_prd_id",
+          "type": "STRING",
+          "index": "4"
+        },
+        {
+          "logical_name_en": "Size",
+          "physical_name": "trn_size",
+          "type": "STRING",
+          "index": "5"
+        },
+        {
+          "logical_name_en": "Color",
+          "physical_name": "trn_clr",
+          "type": "STRING",
+          "index": "6"
+        },
+        {
+          "logical_name_en": "Unit Price",
+          "physical_name": "trn_unit_prc",
+          "type": "STRING",
+          "index": "7"
+        },
+        {
+          "logical_name_en": "Quantity",
+          "physical_name": "trn_qty",
+          "type": "STRING",
+          "index": "8"
+        },
+        {
+          "logical_name_en": "Date",
+          "physical_name": "trn_date",
+          "type": "STRING",
+          "index": "9"
+        },
+        {
+          "logical_name_en": "Discount",
+          "physical_name": "trn_dscnt",
+          "type": "STRING",
+          "index": "10"
+        },
+        {
+          "logical_name_en": "Line Total",
+          "physical_name": "trn_line_ttl",
+          "type": "STRING",
+          "index": "11"
+        },
+        {
+          "logical_name_en": "Store ID",
+          "physical_name": "str_id",
+          "type": "STRING",
+          "index": "12"
+        },
+        {
+          "logical_name_en": "Employee ID",
+          "physical_name": "emply_id",
+          "type": "STRING",
+          "index": "13"
+        },
+        {
+          "logical_name_en": "Currency",
+          "physical_name": "trn_crncy",
+          "type": "STRING",
+          "index": "14"
+        },
+        {
+          "logical_name_en": "Currency Symbol",
+          "physical_name": "trn_crncy_sbl",
+          "type": "STRING",
+          "index": "15"
+        },
+        {
+          "logical_name_en": "SKU",
+          "physical_name": "trn_sku",
+          "type": "STRING",
+          "index": "16"
+        },
+        {
+          "logical_name_en": "Transaction Type",
+          "physical_name": "trn_type",
+          "type": "STRING",
+          "index": "17"
+        },
+        {
+          "logical_name_en": "Payment Method",
+          "physical_name": "trn_pymnt_mthd",
+          "type": "STRING",
+          "index": "18"
+        },
+        {
+          "logical_name_en": "Invoice Total",
+          "physical_name": "trn_invc_ttl",
+          "type": "STRING",
+          "index": "19"
+        }
+      ]
+    }
+  }

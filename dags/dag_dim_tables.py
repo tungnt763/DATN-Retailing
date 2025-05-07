@@ -1,0 +1,106 @@
+import os
+from airflow.decorators import dag, task, task_group
+from datetime import datetime, timedelta
+from airflow.providers.google.cloud.sensors.gcs import GCSObjectsWithPrefixExistenceSensor
+from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateEmptyDatasetOperator
+from resources.business.task_group_loading_layer import loading_layer
+from lib.utils import load_db_env, get_table_names
+
+HOME = os.getenv('AIRFLOW_HOME')
+
+db_env = load_db_env()
+_gcp_conn_id = 'gcp'
+_project = db_env.get('project')
+_load_dataset = db_env.get('load_dataset')
+_clean_dataset = db_env.get('clean_dataset')
+_dwh_dataset = db_env.get('dwh_dataset')
+_bucket_name = db_env.get('bucket_name')
+
+_table_names = get_table_names()
+
+default_args = {
+    'depends_on_past': False,
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 0,
+    'retry_delay': timedelta(minutes=5),
+}
+
+def create_dag(_dag_id, _schedule, **kwargs):
+
+    @dag(
+        dag_id=_dag_id,
+        schedule_interval=_schedule,
+        start_date=datetime(2023, 1, 1),
+        catchup=False,
+        default_args=default_args,
+        tags=[kwargs.get('table_name')]
+    )
+    def get_dag():
+        
+        check_gcs_file = GCSObjectsWithPrefixExistenceSensor(
+            task_id=f'check_gcs_{kwargs.get("table_name")}_file',
+            bucket=kwargs.get('bucket_name'),
+            prefix=kwargs.get('prefix_name'), 
+            google_cloud_conn_id=kwargs.get('gcp_conn_id'),
+            timeout=300,
+            poke_interval=60,
+            soft_fail=True,
+            mode='reschedule',
+        )
+
+        create_load_dataset = BigQueryCreateEmptyDatasetOperator(
+            task_id='create_load_dataset',
+            gcp_conn_id=kwargs.get('gcp_conn_id'),
+            dataset_id=kwargs.get('load_dataset'),
+            project_id=kwargs.get('project'),
+            location='US',
+            exists_ok=True,
+        )
+
+        loading_layer_task_group = loading_layer(**kwargs)
+
+        @task
+        def cleaning_layer():
+            # Logic to clean data
+            pass
+
+        @task
+        def dwh_layer():
+            # Logic to archive file
+            pass
+
+        cleaning_layer_task_group = cleaning_layer()
+
+        dwh_layer_task_group = dwh_layer()
+
+        check_gcs_file >> create_load_dataset >> loading_layer_task_group >> cleaning_layer_task_group >> dwh_layer_task_group 
+
+    get_dag()
+
+for _table_name in _table_names:
+    _dag_id = f'dag_{_table_name}'
+    _schedule = '0 0 * * *'
+
+    config = {
+        'dag_id': _dag_id,
+        'schedule': _schedule,
+
+        'gcp_conn_id': _gcp_conn_id,
+        'project': _project,
+        'load_dataset': _load_dataset,
+        'clean_dataset': _clean_dataset,
+        'dwh_dataset': _dwh_dataset,
+
+        'bucket_name': _bucket_name,
+        'table_name': _table_name,
+        'prefix_name': f'raw/{_table_name}'
+    }
+
+    globals()[_dag_id] = create_dag(_dag_id, _schedule, **config)
+
+
+
+
+
+

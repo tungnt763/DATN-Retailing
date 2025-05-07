@@ -1,0 +1,21 @@
+checks for employees_temp:
+- schema:
+    fail:
+      when required column missing:
+      - emply_id
+      when wrong column type:
+        emply_id: string
+        emply_str_id: string
+        emply_name: string
+        emply_pstn: string
+- row_count > 0:
+    name: Employees table contains data
+- failed rows:
+    name: Column count must be 4
+    fail query: |-
+      SELECT COUNT(*) AS col_count
+      FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
+      WHERE table_name = 'employees_temp'
+      HAVING col_count != 4
+- missing_count(emply_id) = 0:
+    name: Employee ID is required

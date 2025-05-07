@@ -1,0 +1,38 @@
+checks for products_temp:
+- schema:
+    fail:
+      when required column missing:
+      - prd_id
+      - prd_ctgry
+      - prd_cost
+      when wrong column type:
+        prd_id: string
+        prd_ctgry: string
+        prd_sub_ctgry: string
+        prd_desc_pt: string
+        prd_desc_de: string
+        prd_desc_fr: string
+        prd_desc_es: string
+        prd_desc_en: string
+        prd_desc_zh: string
+        prd_color: string
+        prd_sizes: string
+        prd_cost: string
+- row_count > 0:
+    name: Products table contains data
+- failed rows:
+    name: Column count must be 12
+    fail query: |-
+      SELECT COUNT(*) AS col_count
+      FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
+      WHERE table_name = 'products_temp'
+      HAVING col_count != 12
+- missing_count(prd_id) = 0:
+    name: Product ID is required
+- missing_count(prd_ctgry) = 0:
+    name: Category is required
+- missing_count(prd_cost) = 0:
+    name: Production Cost is required
+- invalid_count(prd_cost) = 0:
+    name: Production Cost format validation
+    valid format: positive decimal point

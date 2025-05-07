@@ -1,0 +1,45 @@
+checks for customers_temp:
+- schema:
+    fail:
+      when required column missing:
+      - cstmr_id
+      - cstmr_tel
+      when wrong column type:
+        cstmr_id: string
+        cstmr_name: string
+        cstmr_eml: string
+        cstmr_tel: string
+        cstmr_city: string
+        cstmr_cntry: string
+        cstmr_gender: string
+        cstmr_brthdy: string
+        cstmr_job_title: string
+- row_count > 0:
+    name: Customers table contains data
+- failed rows:
+    name: Column count must be 9
+    fail query: |-
+      SELECT COUNT(*) AS col_count
+      FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
+      WHERE table_name = 'customers_temp'
+      HAVING col_count != 9
+- missing_count(cstmr_id) = 0:
+    name: Customer ID is required
+- missing_count(cstmr_tel) = 0:
+    name: Telephone is required
+- invalid_count(cstmr_eml) = 0:
+    name: Email format validation
+    valid format: email
+- invalid_count(cstmr_tel) = 0:
+    name: Telephone format validation
+    valid format: phone number
+- invalid_count(cstmr_brthdy) = 0:
+    name: Date of Birth format validation
+    valid format: date inverse
+- invalid_count(cstmr_brthdy) = 0:
+    name: Date of Birth regex validation
+    valid regex: ^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$
+- invalid_percentage(cstmr_gender) = 0:
+    name: Gender must be in allowed values
+    valid values: |-
+      ["F", "M", "O", "U", "D"]

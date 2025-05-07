@@ -1,0 +1,40 @@
+checks for stores_temp:
+- schema:
+    fail:
+      when required column missing:
+      - str_id
+      - str_lat
+      - str_lon
+      when wrong column type:
+        str_id: string
+        str_cntry: string
+        str_city: string
+        str_name: string
+        str_emply_num: string
+        str_zip_cd: string
+        str_lat: string
+        str_lon: string
+- row_count > 0:
+    name: Stores table contains data
+- failed rows:
+    name: Column count must be 8
+    fail query: |-
+      SELECT COUNT(*) AS col_count
+      FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
+      WHERE table_name = 'stores_temp'
+      HAVING col_count != 8
+- missing_count(str_id) = 0:
+    name: Store ID is required
+- missing_count(str_lat) = 0:
+    name: Latitude is required
+- missing_count(str_lon) = 0:
+    name: Longitude is required
+- invalid_count(str_emply_num) = 0:
+    name: Number of Employees format validation
+    valid format: positive integer
+- invalid_count(str_lat) = 0:
+    name: Latitude format validation
+    valid format: decimal point
+- invalid_count(str_lon) = 0:
+    name: Longitude format validation
+    valid format: decimal point

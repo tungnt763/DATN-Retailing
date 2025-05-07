@@ -1,0 +1,52 @@
+checks for discounts_temp:
+  - schema:
+      fail:
+        when required column missing: [dscnt_start_date, dscnt_value]
+        when wrong column type:
+          dscnt_start_date: string
+          dscnt_end_date: string
+          dscnt_value: string
+          dscnt_desc: string
+          dscnt_ctgry: string
+          dscnt_sub_ctgry: string
+  
+  # Basic row count check
+  - row_count > 0:
+      name: Discounts table contains data
+
+  # Check column numbers
+  - failed rows:
+      name: Column count must be 6
+      fail query: |
+        SELECT COUNT(*) AS col_count
+        FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
+        WHERE table_name = 'discounts_temp'
+        HAVING col_count != 6
+
+  # Required fields validation
+  - missing_count(dscnt_start_date) = 0:
+      name: Start date is required
+  - missing_count(dscnt_value) = 0:
+      name: Discount value is required
+
+  # Date format validation
+  - invalid_count(dscnt_start_date) = 0:
+      name: Start date format validation
+      valid format: date inverse
+  - invalid_count(dscnt_end_date) = 0:
+      name: End date format validation
+      valid format: date inverse
+
+  # Discount value range validation (between 0 and 1)
+  - invalid_count(dscnt_value) = 0:
+      name: Discount value range validation
+      valid regex: ^0(\.\d+)?$|^1(\.0+)?$
+
+  # Logical date validation
+  - failed rows:
+      name: End date must be after start date
+      fail query: |
+        SELECT *
+        FROM `datn-retailing.edw_loaded.discounts_temp`
+        WHERE dscnt_end_date IS NOT NULL 
+        AND dscnt_start_date > dscnt_end_date
