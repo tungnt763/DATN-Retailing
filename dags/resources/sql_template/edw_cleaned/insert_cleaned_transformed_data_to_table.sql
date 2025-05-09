@@ -11,7 +11,7 @@ WITH cleaned_data AS (
         batch_load_ts
     FROM `{{ params.project_name }}.{{ params.input_dataset }}.{{ params.table_name }}`
     WHERE
-        batch_load_ts > TIMESTAMP('{{ task_instance.xcom_pull(task_ids="loading_layer.get_max_timestamp", key="max_timestamp") }}')
+        create_date > TIMESTAMP('{{ task_instance.xcom_pull(task_ids="loading_layer.get_max_timestamp", key="max_timestamp") }}')
 ),
 
 deduplicated_valid_data AS (

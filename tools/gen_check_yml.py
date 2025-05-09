@@ -61,11 +61,11 @@ def generate_checks(table_name, table_info):
             f"SELECT COUNT(*) AS col_count\n"
             f"FROM `datn-retailing.{DATASET}.INFORMATION_SCHEMA.COLUMNS`\n"
             f"WHERE table_name = '{table_name}{TABLE_NAME_SUFFIX}'\n"
-            f"HAVING col_count != {int(table_info['col_nums']) + 3}"
+            f"HAVING col_count != {int(table_info['col_nums']) + 6}"
         )
         checks[f"checks for {table_name}{TABLE_NAME_SUFFIX}"].append({
             "failed rows": {
-                "name": f"Column count should be exactly {int(table_info['col_nums']) + 3}",
+                "name": f"Column count should be exactly {int(table_info['col_nums']) + 6}",
                 "fail query": col_count_check
             }
         })

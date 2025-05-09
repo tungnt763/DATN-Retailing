@@ -6,7 +6,10 @@ CREATE TABLE IF NOT EXISTS `{{ params.project_name }}.{{ params.dataset_name }}.
     {{ params.schema_columns }},
     loaded_batch STRING,
     loaded_part DATE,
-    batch_load_ts TIMESTAMP
+    batch_load_ts TIMESTAMP,
+    create_date TIMESTAMP,
+    create_task_id STRING,
+    create_task_run_id STRING
 );
 
 -- Xóa dữ liệu nếu max_timestamp là giá trị mặc định
@@ -20,6 +23,9 @@ SELECT
     {{ params.columns }},
     loaded_batch,
     loaded_part,
-    batch_load_ts
+    batch_load_ts,
+    create_date,
+    create_task_id,
+    create_task_run_id
 FROM 
     `{{ params.project_name }}.{{ params.dataset_name }}.{{ params.table_name }}_temp`;
