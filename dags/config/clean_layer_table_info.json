@@ -17,7 +17,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": ""
       },
       {
         "logical_name_en": "Name",
@@ -31,7 +32,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Email",
@@ -45,7 +47,8 @@
         "max": "",
         "values": [],
         "regax": "^[a-zA-ZÀ-ÿĀ-ſƀ-ȳ0-9.\\-_%+]+@[a-zA-ZÀ-ÿĀ-ſƀ-ȳ0-9.\\-_%]+\\.[A-Za-z]{2,4}$",
-        "other": ""
+        "other": "",
+        "default_value": "unknown@unknown.com"
       },
       {
         "logical_name_en": "Telephone",
@@ -59,7 +62,8 @@
         "max": "",
         "values": [],
         "regax": "^(\\+?\\d{1,3}[\\s\\.\\-]?)?(\\(0?\\d{1,5}\\)[\\s\\.\\-]?|\\d{1,5}[\\s\\.\\-]?)?(\\d{1,4}[\\s\\.\\-]?){1,5}(x|ext\\.?|#)?\\d{1,6}?$",
-        "other": ""
+        "other": "",
+        "default_value": "0000000000"
       },
       {
         "logical_name_en": "City",
@@ -73,7 +77,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Country",
@@ -87,7 +92,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Gender",
@@ -101,12 +107,13 @@
         "max": "",
         "values": ["F", "M", "O", "U", "D"],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "U"
       },
       {
         "logical_name_en": "Date of Birth",
         "physical_name": "cstmr_brthdy",
-        "type": "STRING",
+        "type": "DATE",
         "index": "8",
         "pk": "N",
         "mode": "NULLABLE",
@@ -115,7 +122,8 @@
         "max": "",
         "values": [],
         "regax": "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$",
-        "other": ""
+        "other": "",
+        "default_value": "1900-01-01"
       },
       {
         "logical_name_en": "Job Title",
@@ -129,7 +137,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       }
     ]
   },
@@ -142,7 +151,7 @@
       {
         "logical_name_en": "Start Date",
         "physical_name": "dscnt_start_date",
-        "type": "STRING",
+        "type": "DATE",
         "index": "1",
         "pk": "N",
         "mode": "REQUIRED",
@@ -151,12 +160,13 @@
         "max": "",
         "values": [],
         "regax": "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$",
-        "other": ""
+        "other": "",
+        "default_value": "1900-01-01"
       },
       {
         "logical_name_en": "End Date",
         "physical_name": "dscnt_end_date",
-        "type": "STRING",
+        "type": "DATE",
         "index": "2",
         "pk": "N",
         "mode": "NULLABLE",
@@ -165,12 +175,13 @@
         "max": "",
         "values": [],
         "regax": "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$",
-        "other": "SELECT * FROM `datn-retailing.edw_loaded.discounts_temp` WHERE dscnt_end_date IS NOT NULL AND dscnt_start_date > dscnt_end_date"
+        "other": "SELECT * FROM `datn-retailing.edw_loaded.discounts_temp` WHERE dscnt_end_date IS NOT NULL AND dscnt_start_date > dscnt_end_date",
+        "default_value": "2099-12-31"
       },
       {
         "logical_name_en": "Discount",
         "physical_name": "dscnt_value",
-        "type": "STRING",
+        "type": "NUMERIC",
         "index": "3",
         "pk": "N",
         "mode": "REQUIRED",
@@ -179,7 +190,8 @@
         "max": "",
         "values": [],
         "regax": "^0(\\.\\d+)?$|^1(\\.0+)?$",
-        "other": ""
+        "other": "",
+        "default_value": "0.0"
       },
       {
         "logical_name_en": "Description",
@@ -193,7 +205,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Category",
@@ -207,7 +220,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Sub Category",
@@ -221,7 +235,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       }
     ]
   },
@@ -243,7 +258,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": ""
       },
       {
         "logical_name_en": "Store ID",
@@ -257,7 +273,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": ""
       },
       {
         "logical_name_en": "Name",
@@ -271,7 +288,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Position",
@@ -285,7 +303,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       }
     ]
   },
@@ -306,7 +325,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": ""
       },
       {
         "logical_name_en": "Category",
@@ -320,7 +340,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Sub Category",
@@ -334,7 +355,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Description PT",
@@ -348,7 +370,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Description DE",
@@ -362,7 +385,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Description FR",
@@ -376,7 +400,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Description ES",
@@ -390,7 +415,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Description EN",
@@ -404,7 +430,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Description ZH",
@@ -418,7 +445,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Color",
@@ -432,7 +460,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Sizes",
@@ -446,12 +475,13 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Production Cost",
         "physical_name": "prd_cost",
-        "type": "STRING",
+        "type": "NUMERIC",
         "index": "12",
         "pk": "N",
         "mode": "REQUIRED",
@@ -460,7 +490,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "0.0"
       }
     ]
   },
@@ -481,7 +512,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": ""
       },
       {
         "logical_name_en": "Country",
@@ -495,7 +527,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "City",
@@ -509,7 +542,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Store Name",
@@ -523,12 +557,13 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Number of Employees",
         "physical_name": "str_emply_num",
-        "type": "STRING",
+        "type": "INT64",
         "index": "5",
         "pk": "N",
         "mode": "NULLABLE",
@@ -537,7 +572,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "0"
       },
       {
         "logical_name_en": "ZIP Code",
@@ -551,12 +587,13 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": ""
       },
       {
         "logical_name_en": "Latitude",
         "physical_name": "str_lat",
-        "type": "STRING",
+        "type": "NUMERIC",
         "index": "7",
         "pk": "N",
         "mode": "REQUIRED",
@@ -565,12 +602,13 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": ""
       },
       {
         "logical_name_en": "Longitude",
         "physical_name": "str_lon",
-        "type": "STRING",
+        "type": "NUMERIC",
         "index": "8",
         "pk": "N",
         "mode": "REQUIRED",
@@ -579,7 +617,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": ""
       }
     ]
   },
@@ -600,12 +639,13 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": ""
       },
       {
         "logical_name_en": "Line",
         "physical_name": "trn_line",
-        "type": "STRING",
+        "type": "INT64",
         "index": "2",
         "pk": "Y",
         "mode": "REQUIRED",
@@ -614,7 +654,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "0"
       },
       {
         "logical_name_en": "Customer ID",
@@ -628,7 +669,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": ""
       },
       {
         "logical_name_en": "Product ID",
@@ -642,7 +684,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": ""
       },
       {
         "logical_name_en": "Size",
@@ -656,7 +699,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Color",
@@ -670,12 +714,13 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Unit Price",
         "physical_name": "trn_unit_prc",
-        "type": "STRING",
+        "type": "NUMERIC",
         "index": "7",
         "pk": "N",
         "mode": "NULLABLE",
@@ -684,12 +729,13 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "0.0"
       },
       {
         "logical_name_en": "Quantity",
         "physical_name": "trn_qty",
-        "type": "STRING",
+        "type": "INT64",
         "index": "8",
         "pk": "N",
         "mode": "REQUIRED",
@@ -698,12 +744,13 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "0"
       },
       {
         "logical_name_en": "Date",
         "physical_name": "trn_date",
-        "type": "STRING",
+        "type": "DATETIME",
         "index": "9",
         "pk": "N",
         "mode": "REQUIRED",
@@ -712,12 +759,13 @@
         "max": "",
         "values": [],
         "regax": "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])\\s([01]\\d|2[0-3])-[0-5]\\d-[0-5]\\d$",
-        "other": ""
+        "other": "",
+        "default_value": "1900-01-01 00:00:00"
       },
       {
         "logical_name_en": "Discount",
         "physical_name": "trn_dscnt",
-        "type": "STRING",
+        "type": "NUMERIC",
         "index": "10",
         "pk": "N",
         "mode": "NULLABLE",
@@ -726,12 +774,13 @@
         "max": "",
         "values": [],
         "regax": "^0(\\.\\d+)?$|^1(\\.0+)?$",
-        "other": ""
+        "other": "",
+        "default_value": "0.0"
       },
       {
         "logical_name_en": "Line Total",
         "physical_name": "trn_line_ttl",
-        "type": "STRING",
+        "type": "NUMERIC",
         "index": "11",
         "pk": "N",
         "mode": "NULLABLE",
@@ -740,7 +789,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "0.0"
       },
       {
         "logical_name_en": "Store ID",
@@ -754,7 +804,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": ""
       },
       {
         "logical_name_en": "Employee ID",
@@ -768,7 +819,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": ""
       },
       {
         "logical_name_en": "Currency",
@@ -782,7 +834,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Currency Symbol",
@@ -796,7 +849,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "SKU",
@@ -810,7 +864,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Transaction Type",
@@ -824,7 +879,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Payment Method",
@@ -838,12 +894,13 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "Unknown"
       },
       {
         "logical_name_en": "Invoice Total",
         "physical_name": "trn_invc_ttl",
-        "type": "STRING",
+        "type": "NUMERIC",
         "index": "19",
         "pk": "N",
         "mode": "NULLABLE",
@@ -852,7 +909,8 @@
         "max": "",
         "values": [],
         "regax": "",
-        "other": ""
+        "other": "",
+        "default_value": "0.0"
       }
     ]
   }

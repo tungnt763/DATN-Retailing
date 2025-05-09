@@ -1,0 +1,24 @@
+checks for stores:
+- schema:
+    fail:
+      when required column missing:
+      - str_id
+      - str_lat
+      - str_lon
+      when wrong column type:
+        str_id: string
+        str_cntry: string
+        str_city: string
+        str_name: string
+        str_emply_num: int64
+        str_zip_cd: string
+        str_lat: numeric
+        str_lon: numeric
+- row_count > 0:
+    name: stores should contain data
+- missing_count(str_id) = 0:
+    name: Store ID must not be null
+- missing_count(str_lat) = 0:
+    name: Latitude must not be null
+- missing_count(str_lon) = 0:
+    name: Longitude must not be null

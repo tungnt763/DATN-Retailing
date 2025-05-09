@@ -1,15 +1,15 @@
 from airflow.decorators import task
 
 @task.external_python(python='/opt/airflow/soda_venv/bin/python')
-def check_load(table_name, load_dataset):
+def data_quality_check(table_name, dataset):
     from soda.scan import Scan
 
-    scan_name=f'check_{table_name}_load'
-    data_source='retail_load'
+    scan_name=f'data_quality_check_{table_name}'
+    data_source=f'retail_{dataset}'
 
     print('Running Soda Scan ...')
-    config_file = f'include/soda/{load_dataset}/configuration.yml'
-    checks_path = f'include/soda/{load_dataset}/checks/sources/check_{table_name}.yml'
+    config_file = f'include/soda/{dataset}/configuration.yml'
+    checks_path = f'include/soda/{dataset}/checks/sources/check_{table_name}.yml'
 
     scan = Scan()
     scan.set_verbose()

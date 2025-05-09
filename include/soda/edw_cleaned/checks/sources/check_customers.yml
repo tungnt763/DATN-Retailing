@@ -1,0 +1,40 @@
+checks for customers:
+- schema:
+    fail:
+      when required column missing:
+      - cstmr_id
+      - cstmr_tel
+      when wrong column type:
+        cstmr_id: string
+        cstmr_name: string
+        cstmr_eml: string
+        cstmr_tel: string
+        cstmr_city: string
+        cstmr_cntry: string
+        cstmr_gender: string
+        cstmr_brthdy: date
+        cstmr_job_title: string
+- row_count > 0:
+    name: customers should contain data
+- missing_count(cstmr_id) = 0:
+    name: Customer ID must not be null
+- invalid_count(cstmr_eml) = 0:
+    name: Email must match format
+    valid format: email
+- invalid_count(cstmr_eml) = 0:
+    name: Email regex validation
+    valid regex: "^[a-zA-Z\xC0-\xFF\u0100-\u017F\u0180-\u02330-9.\\-_%+]+@[a-zA-Z\xC0\
+      -\xFF\u0100-\u017F\u0180-\u02330-9.\\-_%]+\\.[A-Za-z]{2,4}$"
+- missing_count(cstmr_tel) = 0:
+    name: Telephone must not be null
+- invalid_count(cstmr_tel) = 0:
+    name: Telephone regex validation
+    valid regex: ^(\+?\d{1,3}[\s\.\-]?)?(\(0?\d{1,5}\)[\s\.\-]?|\d{1,5}[\s\.\-]?)?(\d{1,4}[\s\.\-]?){1,5}(x|ext\.?|#)?\d{1,6}?$
+- invalid_percent(cstmr_gender) = 0:
+    name: Gender must be within allowed values
+    valid values:
+      - F
+      - M
+      - O
+      - U
+      - D

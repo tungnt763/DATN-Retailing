@@ -1,7 +1,14 @@
 from airflow.decorators import task, task_group
-from lib.utils import get_schema_field_load_layer, list_all_file_name_gcs
-from resources.python_task.loading_layer import check_load
+from lib.utils import get_schema_field_load_layer, list_all_file_name_gcs, get_schema_load_table
+from resources.python_task.data_quality_check import data_quality_check
+from resources.python_task.get_max_timestamp_task import get_max_timestamp_task
+from resources.python_task.insert_job_task import insert_job_task
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
+from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateEmptyDatasetOperator
+from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
+
+import os
+from datetime import datetime, timezone
 
 @task_group(group_id='loading_layer')
 def loading_layer(**kwargs):
@@ -13,9 +20,20 @@ def loading_layer(**kwargs):
     _prefix_name = kwargs.get('prefix_name')
     _gcp_conn_id = kwargs.get('gcp_conn_id')
 
+    _sql_template = os.path.join("resources", "sql_template", _dataset_name, "insert_temp_to_load_table.sql")
+
     schema_fields_list = get_schema_field_load_layer(_table_name)
 
     source_objects_list = list_all_file_name_gcs(_table_name, _gcp_conn_id, _bucket_name, _prefix_name)
+
+    create_load_dataset = BigQueryCreateEmptyDatasetOperator(
+            task_id='create_load_dataset',
+            gcp_conn_id=_gcp_conn_id,
+            dataset_id=_dataset_name,
+            project_id=_project_name,
+            location='US',
+            exists_ok=True,
+        )
 
     load_data_to_bigquery = GCSToBigQueryOperator(
         task_id=f'load_{_table_name}_gcs_to_bigquery',
@@ -23,10 +41,36 @@ def loading_layer(**kwargs):
         bucket=_bucket_name,
         source_objects=source_objects_list,
         destination_project_dataset_table=f"{_project_name}.{_dataset_name}.{_table_name}_temp",
-        schema_fields= schema_fields_list,
+        schema_fields=schema_fields_list,
         write_disposition='WRITE_TRUNCATE',
     )
 
-    check_load_task = check_load.override(task_id=f'check_{_table_name}_load')(_table_name, _dataset_name)
+    load_temp_to_table = BigQueryInsertJobOperator(
+        task_id=f'load_temp_to_{_table_name}',
+        configuration={
+            "query": {
+                "query": "{% include '" + _sql_template + "' %}",
+                "useLegacySql": False,
+            }
+        },
+        params={
+            'project_name': _project_name,
+            'dataset_name': _dataset_name,
+            'table_name': _table_name,
+            'schema_columns': get_schema_load_table(_table_name),
+        },
+        location='US', 
+        gcp_conn_id=_gcp_conn_id
+    )
 
-    load_data_to_bigquery >> check_load_task
+    max_timestamp = get_max_timestamp_task(gcp_conn_id=_gcp_conn_id, dataset_name=_dataset_name, table_name=_table_name)
+
+    dqc = data_quality_check.override(task_id=f'data_quality_check_{_table_name}')(_table_name, _dataset_name)
+
+    insert_job = insert_job_task.override(task_id=f'insert_loaded_{_table_name}_job_to_log')(gcp_conn_id=_gcp_conn_id, dataset_name=_dataset_name, table_name=_table_name)
+
+    max_timestamp >> create_load_dataset
+
+    create_load_dataset >> load_data_to_bigquery >> dqc
+    
+    dqc >> load_temp_to_table >> insert_job

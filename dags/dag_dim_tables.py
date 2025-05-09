@@ -1,9 +1,9 @@
 import os
 from airflow.decorators import dag, task, task_group
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from airflow.providers.google.cloud.sensors.gcs import GCSObjectsWithPrefixExistenceSensor
-from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateEmptyDatasetOperator
 from resources.business.task_group_loading_layer import loading_layer
+from resources.business.task_group_cleaned_layer import clean_layer
 from lib.utils import load_db_env, get_table_names
 
 HOME = os.getenv('AIRFLOW_HOME')
@@ -37,6 +37,8 @@ def create_dag(_dag_id, _schedule, **kwargs):
         tags=[kwargs.get('table_name')]
     )
     def get_dag():
+
+        kwargs['loaded_batch'] = '{{ execution_date.int_timestamp }}'
         
         check_gcs_file = GCSObjectsWithPrefixExistenceSensor(
             task_id=f'check_gcs_{kwargs.get("table_name")}_file',
@@ -49,32 +51,18 @@ def create_dag(_dag_id, _schedule, **kwargs):
             mode='reschedule',
         )
 
-        create_load_dataset = BigQueryCreateEmptyDatasetOperator(
-            task_id='create_load_dataset',
-            gcp_conn_id=kwargs.get('gcp_conn_id'),
-            dataset_id=kwargs.get('load_dataset'),
-            project_id=kwargs.get('project'),
-            location='US',
-            exists_ok=True,
-        )
-
         loading_layer_task_group = loading_layer(**kwargs)
 
-        @task
-        def cleaning_layer():
-            # Logic to clean data
-            pass
+        clean_layer_task_group = clean_layer(**kwargs)
 
         @task
         def dwh_layer():
             # Logic to archive file
             pass
 
-        cleaning_layer_task_group = cleaning_layer()
-
         dwh_layer_task_group = dwh_layer()
 
-        check_gcs_file >> create_load_dataset >> loading_layer_task_group >> cleaning_layer_task_group >> dwh_layer_task_group 
+        check_gcs_file >> loading_layer_task_group >> clean_layer_task_group >> dwh_layer_task_group 
 
     get_dag()
 

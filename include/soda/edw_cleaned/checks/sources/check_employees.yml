@@ -1,0 +1,14 @@
+checks for employees:
+- schema:
+    fail:
+      when required column missing:
+      - emply_id
+      when wrong column type:
+        emply_id: string
+        emply_str_id: string
+        emply_name: string
+        emply_pstn: string
+- row_count > 0:
+    name: employees should contain data
+- missing_count(emply_id) = 0:
+    name: Employee ID must not be null

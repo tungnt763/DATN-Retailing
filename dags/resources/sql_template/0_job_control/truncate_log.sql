@@ -1,0 +1,1 @@
+TRUNCATE TABLE `datn-retailing.edw.job_log`;

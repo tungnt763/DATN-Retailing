@@ -27,19 +27,19 @@ checks for customers_temp:
     name: Customer ID is required
 - missing_count(cstmr_tel) = 0:
     name: Telephone is required
-- invalid_count(cstmr_eml) = 0:
+- invalid_percent(cstmr_eml) < 30:
     name: Email format validation
     valid format: email
-- invalid_count(cstmr_tel) = 0:
-    name: Telephone format validation
-    valid format: phone number
 - invalid_count(cstmr_brthdy) = 0:
     name: Date of Birth format validation
     valid format: date inverse
+- invalid_percent(cstmr_tel) < 10:
+    name: Telephone regex validation
+    valid regex: ^(\+?\d{1,3}[\s\.\-]?)?(\(0?\d{1,5}\)[\s\.\-]?|\d{1,5}[\s\.\-]?)?(\d{1,4}[\s\.\-]?){1,5}(x|ext\.?|#)?\d{1,6}?$
 - invalid_count(cstmr_brthdy) = 0:
     name: Date of Birth regex validation
     valid regex: ^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$
-- invalid_percentage(cstmr_gender) = 0:
+- invalid_percent(cstmr_gender) = 0:
     name: Gender must be in allowed values
-    valid values: |-
+    valid values:
       ["F", "M", "O", "U", "D"]

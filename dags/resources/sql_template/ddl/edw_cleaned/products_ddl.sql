@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS `datn-retailing.edw_cleaned.products` (
+    prd_id                    STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Product ID\", \"clmn_desc\": \"Product ID of the products table\"}"),
+    prd_ctgry                 STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Category\", \"clmn_desc\": \"Category of the products table\"}"),
+    prd_sub_ctgry             STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Sub Category\", \"clmn_desc\": \"Sub Category of the products table\"}"),
+    prd_desc_pt               STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Description PT\", \"clmn_desc\": \"Description PT of the products table\"}"),
+    prd_desc_de               STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Description DE\", \"clmn_desc\": \"Description DE of the products table\"}"),
+    prd_desc_fr               STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Description FR\", \"clmn_desc\": \"Description FR of the products table\"}"),
+    prd_desc_es               STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Description ES\", \"clmn_desc\": \"Description ES of the products table\"}"),
+    prd_desc_en               STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Description EN\", \"clmn_desc\": \"Description EN of the products table\"}"),
+    prd_desc_zh               STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Description ZH\", \"clmn_desc\": \"Description ZH of the products table\"}"),
+    prd_color                 STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Color\", \"clmn_desc\": \"Color of the products table\"}"),
+    prd_sizes                 STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Sizes\", \"clmn_desc\": \"Sizes of the products table\"}"),
+    prd_cost                  NUMERIC NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Production Cost\", \"clmn_desc\": \"Production Cost of the products table\"}"),
+    loaded_batch              STRING OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Loaded Batch\", \"clmn_desc\": \"Unix timestamp of the loaded batch\"}"),
+    loaded_part               DATE OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Loaded Part\", \"clmn_desc\": \"Partition date of the batch load\"}"),
+    batch_load_ts             TIMESTAMP OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Batch Load Ts\", \"clmn_desc\": \"Timestamp when batch was loaded\"}"),
+    create_date               TIMESTAMP OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Create Date\", \"clmn_desc\": \"Timestamp when record was created in cleaned layer\"}"),
+    create_task_id            STRING OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Create Task Id\", \"clmn_desc\": \"Airflow task ID that created this record\"}"),
+    create_task_run_id        STRING OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Create Task Run Id\", \"clmn_desc\": \"Airflow run ID that created this record\"}")
+);

@@ -2,147 +2,133 @@ import json
 import os
 import yaml
 
-# Load metadata JSON
-with open("/Users/tungnt763/Documents/DATN-Retailing/dags/config/load_layer_table_info.json") as f:
+# Configuration
+DATASET = "edw_cleaned"
+METADATA = "clean_layer_table_info"
+METADATA_PATH = f"/Users/tungnt763/Documents/DATN-Retailing/dags/config/{METADATA}.json"
+OUTPUT_DIR = f"/Users/tungnt763/Documents/DATN-Retailing/include/soda/{DATASET}/checks/sources"
+TABLE_NAME_SUFFIX = "_temp" if DATASET == "edw_loaded" else ""
+
+# Load metadata
+with open(METADATA_PATH) as f:
     metadata = json.load(f)
 
-# Custom string format for multiline SQL
+# Pretty YAML for SQL blocks
 class LiteralStr(str): pass
 def literal_str_representer(dumper, data):
     return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
 yaml.add_representer(LiteralStr, literal_str_representer)
 
-# Soda-supported formats (from docs)
+# Supported formats
 SODA_FORMATS = {
-    "credit card number", "date eu", "date inverse", "date iso 8601", "date us",
-    "decimal", "decimal comma", "decimal point", "email", "integer", "ip address",
-    "ipv4 address", "ipv6 address", "money", "money comma", "money point",
-    "negative decimal", "negative decimal comma", "negative decimal point",
-    "negative integer", "negative percentage", "negative percentage comma",
-    "negative percentage point", "percentage", "percentage comma", "percentage point",
-    "phone number", "positive decimal", "positive decimal comma", "positive decimal point",
-    "positive integer", "positive percentage", "positive percentage comma",
-    "positive percentage point", "time 12h", "time 12h nosec", "time 24h", "time 24h nosec",
-    "timestamp 12h", "timestamp 24h", "uuid"
+    "email", "date inverse", "positive integer", "positive decimal point", "phone number"
 }
 
-def generate_check_block(table_name, table_info):
-    checks = []
-    required_columns = []
+def generate_checks(table_name, table_info):
+    checks = {f"checks for {table_name}{TABLE_NAME_SUFFIX}": []}
+    required_cols = []
     column_types = {}
 
-    # Gather schema info
-    for col in sorted(table_info["columns"], key=lambda x: int(x["index"])):
+    # Prepare schema info
+    for col in sorted(table_info["columns"], key=lambda c: int(c["index"])):
         column_types[col["physical_name"]] = col["type"].lower()
         if col["mode"] == "REQUIRED":
-            required_columns.append(col["physical_name"])
+            required_cols.append(col["physical_name"])
 
-    # 1. Schema check
-    checks.append({
+    # 1. Schema checks
+    checks[f"checks for {table_name}{TABLE_NAME_SUFFIX}"].append({
         "schema": {
             "fail": {
-                "when required column missing": required_columns,
+                "when required column missing": required_cols,
                 "when wrong column type": column_types
             }
         }
     })
 
-    # 2. Row count
-    checks.append({})
-    checks.append({
+    # 2. Row count must be positive
+    checks[f"checks for {table_name}{TABLE_NAME_SUFFIX}"].append({
         "row_count > 0": {
-            "name": f"{table_name.capitalize()} table contains data"
+            "name": f"{table_name} should contain data"
         }
     })
 
-    # 3. Column count check
-    fail_query = LiteralStr(
-        f"SELECT COUNT(*) AS col_count\n"
-        f"FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`\n"
-        f"WHERE table_name = '{table_name}_temp'\n"
-        f"HAVING col_count != {table_info['col_nums']}"
-    )
-    checks.append({})
-    checks.append({
-        "failed rows": {
-            "name": f"Column count must be {table_info['col_nums']}",
-            "fail query": fail_query
-        }
-    })
+    if DATASET == "edw_loaded":
+        # 3. Column count exact match
+        col_count_check = LiteralStr(
+            f"SELECT COUNT(*) AS col_count\n"
+            f"FROM `datn-retailing.{DATASET}.INFORMATION_SCHEMA.COLUMNS`\n"
+            f"WHERE table_name = '{table_name}{TABLE_NAME_SUFFIX}'\n"
+            f"HAVING col_count != {table_info['col_nums']}"
+        )
+        checks[f"checks for {table_name}{TABLE_NAME_SUFFIX}"].append({
+            "failed rows": {
+                "name": f"Column count should be exactly {table_info['col_nums']}",
+                "fail query": col_count_check
+            }
+        })
 
-    # 4. Required non-null fields
+    # 4. Per-column checks
     for col in table_info["columns"]:
+        name = col["physical_name"]
+        logic_name = col.get("logical_name_en", name)
+
+        # Completeness
         if col["mode"] == "REQUIRED":
-            checks.append({})
-            checks.append({
-                f"missing_count({col['physical_name']}) = 0": {
-                    "name": f"{col['logical_name_en']} is required"
+            checks[f"checks for {table_name}{TABLE_NAME_SUFFIX}"].append({
+                f"missing_count({name}) = 0": {
+                    "name": f"{logic_name} must not be null"
                 }
             })
 
-    # 5. Format checks (only valid if in SODA_FORMATS)
-    for col in table_info["columns"]:
+        # Format validity
         fmt = col.get("format", "").strip().lower()
-        if fmt in SODA_FORMATS:
-            checks.append({})
-            checks.append({
-                f"invalid_count({col['physical_name']}) = 0": {
-                    "name": f"{col['logical_name_en']} format validation",
+        if fmt in SODA_FORMATS and col.get("type") == "STRING":
+            checks[f"checks for {table_name}{TABLE_NAME_SUFFIX}"].append({
+                f"invalid_count({name}) = 0": {
+                    "name": f"{logic_name} must match format",
                     "valid format": fmt
                 }
             })
 
-    # 6. Regex checks
-    for col in table_info["columns"]:
-        if col.get("regax"):
-            checks.append({})
-            checks.append({
-                f"invalid_count({col['physical_name']}) = 0": {
-                    "name": f"{col['logical_name_en']} regex validation",
+        # Regex validity
+        if col.get("regax") and col.get("type") == "STRING":
+            checks[f"checks for {table_name}{TABLE_NAME_SUFFIX}"].append({
+                f"invalid_count({name}) = 0": {
+                    "name": f"{logic_name} regex validation",
                     "valid regex": col["regax"]
                 }
             })
 
-    # 7. Valid values
-    for col in table_info["columns"]:
-        values = col.get("values")
-        if isinstance(values, list) and values:
-            flat_values = "[" + ", ".join(f'"{v}"' for v in values) + "]"
-            checks.append({})
-            checks.append({
-                f"invalid_percentage({col['physical_name']}) = 0": {
-                    "name": f"{col['logical_name_en']} must be in allowed values",
-                    "valid values": LiteralStr(flat_values)
+        # Enum values validity
+        if isinstance(col.get("values"), list) and col["values"]:
+            allowed = LiteralStr("\n".join(f"- {v}" for v in col["values"]))
+            checks[f"checks for {table_name}{TABLE_NAME_SUFFIX}"].append({
+                f"invalid_percent({name}) = 0": {
+                    "name": f"{logic_name} must be within allowed values",
+                    "valid values": allowed
                 }
             })
 
-    # 8. Custom SQL queries
-    for col in table_info["columns"]:
+        # Custom fail SQL
         if col.get("other"):
             for line in col["other"].splitlines():
-                line = line.strip()
-                if line:
-                    checks.append({})
-                    checks.append({
+                if line.strip():
+                    checks[f"checks for {table_name}{TABLE_NAME_SUFFIX}"].append({
                         "failed rows": {
-                            "name": f"Custom check on {col['physical_name']}",
-                            "fail query": LiteralStr(line)
+                            "name": f"Custom check on {name}",
+                            "fail query": LiteralStr(line.strip())
                         }
                     })
 
-    # Clean up: remove any leading/trailing blank blocks
-    filtered = [check for i, check in enumerate(checks) if i == 0 or check]
-    return {f"checks for {table_name}_temp": filtered}
+    return checks
 
-# Output folder
-output_dir = "/Users/tungnt763/Documents/DATN-Retailing/include/soda/edw_loaded/checks/sources"
-os.makedirs(output_dir, exist_ok=True)
+# Ensure output folder exists
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# Generate all YAML files
+# Generate YAML files
 for table_name, table_info in metadata.items():
-    data = generate_check_block(table_name, table_info)
-    output_path = os.path.join(output_dir, f"check_{table_name}.yml")
-    with open(output_path, "w") as f:
-        yaml.dump(data, f, sort_keys=False, default_flow_style=False)
+    checks = generate_checks(table_name, table_info)
+    with open(os.path.join(OUTPUT_DIR, f"check_{table_name}.yml"), "w") as f:
+        yaml.dump(checks, f, sort_keys=False, default_flow_style=False)
 
-print("✅ Generated Soda check YAML files")
+print("✅ Soda check YAML files generated.")

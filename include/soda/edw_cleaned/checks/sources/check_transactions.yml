@@ -1,0 +1,50 @@
+checks for transactions:
+- schema:
+    fail:
+      when required column missing:
+      - trn_invc_id
+      - trn_line
+      - trn_cstmr_id
+      - trn_prd_id
+      - trn_qty
+      - trn_date
+      - trn_str_id
+      - trn_emply_id
+      when wrong column type:
+        trn_invc_id: string
+        trn_line: int64
+        trn_cstmr_id: string
+        trn_prd_id: string
+        trn_sz: string
+        trn_cl: string
+        trn_unit_prc: numeric
+        trn_qty: int64
+        trn_date: datetime
+        trn_dscnt: numeric
+        trn_line_ttl: numeric
+        trn_str_id: string
+        trn_emply_id: string
+        trn_crncy: string
+        trn_crncy_sbl: string
+        trn_sku: string
+        trn_type: string
+        trn_pymnt_mthd: string
+        trn_invc_ttl: numeric
+- row_count > 0:
+    name: transactions should contain data
+- missing_count(trn_invc_id) = 0:
+    name: Invoice ID must not be null
+- missing_count(trn_line) = 0:
+    name: Line must not be null
+- missing_count(trn_cstmr_id) = 0:
+    name: Customer ID must not be null
+- missing_count(trn_prd_id) = 0:
+    name: Product ID must not be null
+- missing_count(trn_qty) = 0:
+    name: Quantity must not be null
+- missing_count(trn_date) = 0:
+    name: Date must not be null
+- missing_count(trn_str_id) = 0:
+    name: Store ID must not be null
+- missing_count(trn_emply_id) = 0:
+    name: Employee ID must not be null
