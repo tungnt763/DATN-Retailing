@@ -3,7 +3,7 @@ SET max_ts = TIMESTAMP('{{ task_instance.xcom_pull(task_ids="loading_layer.get_m
 
 -- Tạo bảng nếu chưa tồn tại
 CREATE TABLE IF NOT EXISTS `{{ params.project_name }}.{{ params.dataset_name }}.{{ params.table_name }}` (
-    {{ params.schema_columns }}
+    {{ params.schema_columns }},
     loaded_batch STRING,
     loaded_part DATE,
     batch_load_ts TIMESTAMP
@@ -17,11 +17,9 @@ END IF;
 -- Chèn dữ liệu mới
 INSERT INTO `{{ params.project_name }}.{{ params.dataset_name }}.{{ params.table_name }}`
 SELECT 
-    *,
-    '{{ execution_date.int_timestamp }}' AS loaded_batch,
-    DATE(TIMESTAMP_SECONDS(CAST('{{ execution_date.int_timestamp }}' AS INT64))) AS loaded_part,
-    TIMESTAMP_SECONDS(CAST('{{ execution_date.int_timestamp }}' AS INT64)) AS batch_load_ts
+    {{ params.columns }},
+    loaded_batch,
+    loaded_part,
+    batch_load_ts
 FROM 
     `{{ params.project_name }}.{{ params.dataset_name }}.{{ params.table_name }}_temp`;
-
-DROP TABLE IF EXISTS `{{ params.project_name }}.{{ params.dataset_name }}.{{ params.table_name }}_temp`;

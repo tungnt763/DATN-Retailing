@@ -9,13 +9,13 @@ checks for employees_temp:
         emply_name: string
         emply_pstn: string
 - row_count > 0:
-    name: Employees table contains data
+    name: employees should contain data
 - failed rows:
-    name: Column count must be 4
+    name: Column count should be exactly 7
     fail query: |-
       SELECT COUNT(*) AS col_count
       FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
       WHERE table_name = 'employees_temp'
-      HAVING col_count != 4
+      HAVING col_count != 7
 - missing_count(emply_id) = 0:
-    name: Employee ID is required
+    name: Employee ID must not be null

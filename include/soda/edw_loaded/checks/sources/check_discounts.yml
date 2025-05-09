@@ -12,34 +12,34 @@ checks for discounts_temp:
         dscnt_ctgry: string
         dscnt_sub_ctgry: string
 - row_count > 0:
-    name: Discounts table contains data
+    name: discounts should contain data
 - failed rows:
-    name: Column count must be 6
+    name: Column count should be exactly 9
     fail query: |-
       SELECT COUNT(*) AS col_count
       FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
       WHERE table_name = 'discounts_temp'
-      HAVING col_count != 6
+      HAVING col_count != 9
 - missing_count(dscnt_start_date) = 0:
-    name: Start Date is required
-- missing_count(dscnt_value) = 0:
-    name: Discount is required
+    name: Start Date must not be null
 - invalid_count(dscnt_start_date) = 0:
-    name: Start Date format validation
-    valid format: date inverse
-- invalid_count(dscnt_end_date) = 0:
-    name: End Date format validation
+    name: Start Date must match format
     valid format: date inverse
 - invalid_count(dscnt_start_date) = 0:
     name: Start Date regex validation
     valid regex: ^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$
 - invalid_count(dscnt_end_date) = 0:
+    name: End Date must match format
+    valid format: date inverse
+- invalid_count(dscnt_end_date) = 0:
     name: End Date regex validation
     valid regex: ^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$
-- invalid_count(dscnt_value) = 0:
-    name: Discount regex validation
-    valid regex: ^0(\.\d+)?$|^1(\.0+)?$
 - failed rows:
     name: Custom check on dscnt_end_date
     fail query: |-
       SELECT * FROM `datn-retailing.edw_loaded.discounts_temp` WHERE dscnt_end_date IS NOT NULL AND dscnt_start_date > dscnt_end_date
+- missing_count(dscnt_value) = 0:
+    name: Discount must not be null
+- invalid_count(dscnt_value) = 0:
+    name: Discount regex validation
+    valid regex: ^0(\.\d+)?$|^1(\.0+)?$

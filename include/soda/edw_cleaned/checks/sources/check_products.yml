@@ -20,6 +20,8 @@ checks for products:
         prd_cost: numeric
 - row_count > 0:
     name: products should contain data
+- duplicate_count(prd_id) = 0:
+    name: (prd_id) must be unique
 - missing_count(prd_id) = 0:
     name: Product ID must not be null
 - missing_count(prd_ctgry) = 0:

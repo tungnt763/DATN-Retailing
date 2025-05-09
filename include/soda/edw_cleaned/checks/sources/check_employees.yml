@@ -10,5 +10,7 @@ checks for employees:
         emply_pstn: string
 - row_count > 0:
     name: employees should contain data
+- duplicate_count(emply_id) = 0:
+    name: (emply_id) must be unique
 - missing_count(emply_id) = 0:
     name: Employee ID must not be null

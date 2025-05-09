@@ -21,7 +21,7 @@ def clean_layer(**kwargs):
 
     _sql_template = os.path.join("resources", "sql_template", _output_dataset, "insert_cleaned_transformed_data_to_table.sql")
 
-    cleaned_column_expressions, selected_columns, pk_cols = get_clean_expressions_for_table(_table_name, 'clean_layer_table_info')
+    cleaned_column_expressions, selected_columns, pk_cols, columns = get_clean_expressions_for_table(_table_name, 'clean_layer_table_info')
 
     create_clean_dataset = BigQueryCreateEmptyDatasetOperator(
             task_id='create_clean_dataset',
@@ -45,7 +45,8 @@ def clean_layer(**kwargs):
             'input_dataset': _input_dataset,
             'output_dataset': _output_dataset,
             'table_name': _table_name,
-            'cleaned_column_expressions': ',\n    '.join(cleaned_column_expressions),
+            'cleaned_column_expressions': ',\n        '.join(cleaned_column_expressions),
+            'columns': ',\n        '.join(columns),
             'selected_columns': ',\n    '.join(selected_columns),
             'pk_expr': ', '.join(pk_cols),
         },

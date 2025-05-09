@@ -18,6 +18,6 @@ checks for discounts:
 - failed rows:
     name: Custom check on dscnt_end_date
     fail query: |-
-      SELECT * FROM `datn-retailing.edw_loaded.discounts_temp` WHERE dscnt_end_date IS NOT NULL AND dscnt_start_date > dscnt_end_date
+      SELECT * FROM `datn-retailing.edw_loaded.discounts` WHERE dscnt_end_date IS NOT NULL AND dscnt_start_date > dscnt_end_date
 - missing_count(dscnt_value) = 0:
     name: Discount must not be null

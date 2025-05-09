@@ -175,7 +175,7 @@
         "max": "",
         "values": [],
         "regax": "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$",
-        "other": "SELECT * FROM `datn-retailing.edw_loaded.discounts_temp` WHERE dscnt_end_date IS NOT NULL AND dscnt_start_date > dscnt_end_date",
+        "other": "SELECT * FROM `datn-retailing.edw_loaded.discounts` WHERE dscnt_end_date IS NOT NULL AND dscnt_start_date > dscnt_end_date",
         "default_value": "2099-12-31"
       },
       {

@@ -105,6 +105,7 @@ def get_schema_load_table(table_name):
     table_data = loading_layer_table_info.get(table_name)
 
     ddl_lines = []
+    columns = []
     for col in sorted(table_data["columns"], key=lambda x: int(x["index"])):
         col_name = col["physical_name"]
         col_type = col["type"]
@@ -116,10 +117,17 @@ def get_schema_load_table(table_name):
         }
         
         description_str = json.dumps(description_obj).replace('"', '\\"')
-        line = f'    {col_name:<25} {col_type} {mode} OPTIONS(description="{description_str}"),'
+        line = f'{col_name:<25} {col_type} {mode} OPTIONS(description="{description_str}")'
         ddl_lines.append(line)
+        columns.append(col_name)
 
-    return '\n'.join(ddl_lines)
+    return [',\n    '.join(ddl_lines), ',\n    '.join(columns)]
+
+def get_unix_timestamp_from_filename(filename: str) -> int:
+    from datetime import datetime
+
+    dt = datetime.strptime(filename.split('.')[0].split('_')[-1], "%Y%m%dT%H%M%S")
+    return int(dt.timestamp())
 
 # >>>>> Cleaned layer <<<<<
 
@@ -191,4 +199,4 @@ def get_clean_expressions_for_table(table_name, metadata_file_name):
     if not pk_cols:
         pk_cols = cols
 
-    return [cleaned_exprs, selected_cols, pk_cols]
+    return [cleaned_exprs, selected_cols, pk_cols, cols]

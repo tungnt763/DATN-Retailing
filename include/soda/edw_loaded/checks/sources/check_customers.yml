@@ -15,31 +15,36 @@ checks for customers_temp:
         cstmr_brthdy: string
         cstmr_job_title: string
 - row_count > 0:
-    name: Customers table contains data
+    name: customers should contain data
 - failed rows:
-    name: Column count must be 9
+    name: Column count should be exactly 12
     fail query: |-
       SELECT COUNT(*) AS col_count
       FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
       WHERE table_name = 'customers_temp'
-      HAVING col_count != 9
+      HAVING col_count != 12
 - missing_count(cstmr_id) = 0:
-    name: Customer ID is required
-- missing_count(cstmr_tel) = 0:
-    name: Telephone is required
+    name: Customer ID must not be null
 - invalid_percent(cstmr_eml) < 30:
-    name: Email format validation
-    valid format: email
-- invalid_count(cstmr_brthdy) = 0:
-    name: Date of Birth format validation
-    valid format: date inverse
+    name: Email regex validation
+    valid regex: "^[a-zA-Z\xC0-\xFF\u0100-\u017F\u0180-\u02330-9.\\-_%+]+@[a-zA-Z\xC0\
+      -\xFF\u0100-\u017F\u0180-\u02330-9.\\-_%]+\\.[A-Za-z]{2,4}$"
+- missing_count(cstmr_tel) = 0:
+    name: Telephone must not be null
 - invalid_percent(cstmr_tel) < 10:
     name: Telephone regex validation
     valid regex: ^(\+?\d{1,3}[\s\.\-]?)?(\(0?\d{1,5}\)[\s\.\-]?|\d{1,5}[\s\.\-]?)?(\d{1,4}[\s\.\-]?){1,5}(x|ext\.?|#)?\d{1,6}?$
+- invalid_percent(cstmr_gender) = 0:
+    name: Gender must be within allowed values
+    valid values:
+      - F
+      - M
+      - O
+      - U
+      - D
+- invalid_count(cstmr_brthdy) = 0:
+    name: Date of Birth must match format
+    valid format: date inverse
 - invalid_count(cstmr_brthdy) = 0:
     name: Date of Birth regex validation
     valid regex: ^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$
-- invalid_percent(cstmr_gender) = 0:
-    name: Gender must be in allowed values
-    valid values:
-      ["F", "M", "O", "U", "D"]

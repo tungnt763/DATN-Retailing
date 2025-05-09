@@ -27,6 +27,7 @@ SODA_FORMATS = {
 def generate_checks(table_name, table_info):
     checks = {f"checks for {table_name}{TABLE_NAME_SUFFIX}": []}
     required_cols = []
+    pk_cols = []
     column_types = {}
 
     # Prepare schema info
@@ -34,6 +35,8 @@ def generate_checks(table_name, table_info):
         column_types[col["physical_name"]] = col["type"].lower()
         if col["mode"] == "REQUIRED":
             required_cols.append(col["physical_name"])
+        if col["pk"] == "Y":
+            pk_cols.append(col["physical_name"])
 
     # 1. Schema checks
     checks[f"checks for {table_name}{TABLE_NAME_SUFFIX}"].append({
@@ -58,12 +61,20 @@ def generate_checks(table_name, table_info):
             f"SELECT COUNT(*) AS col_count\n"
             f"FROM `datn-retailing.{DATASET}.INFORMATION_SCHEMA.COLUMNS`\n"
             f"WHERE table_name = '{table_name}{TABLE_NAME_SUFFIX}'\n"
-            f"HAVING col_count != {table_info['col_nums']}"
+            f"HAVING col_count != {int(table_info['col_nums']) + 3}"
         )
         checks[f"checks for {table_name}{TABLE_NAME_SUFFIX}"].append({
             "failed rows": {
-                "name": f"Column count should be exactly {table_info['col_nums']}",
+                "name": f"Column count should be exactly {int(table_info['col_nums']) + 3}",
                 "fail query": col_count_check
+            }
+        })
+
+    # 3. Unique
+    if DATASET != "edw_loaded" and pk_cols:
+        checks[f"checks for {table_name}{TABLE_NAME_SUFFIX}"].append({
+            f"duplicate_count({', '.join(pk_cols)}) = 0": {
+                "name": f"({', '.join(pk_cols)}) must be unique"
             }
         })
 

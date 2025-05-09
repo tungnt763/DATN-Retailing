@@ -32,6 +32,8 @@ checks for transactions:
         trn_invc_ttl: numeric
 - row_count > 0:
     name: transactions should contain data
+- duplicate_count(trn_invc_id, trn_line) = 0:
+    name: (trn_invc_id, trn_line) must be unique
 - missing_count(trn_invc_id) = 0:
     name: Invoice ID must not be null
 - missing_count(trn_line) = 0:

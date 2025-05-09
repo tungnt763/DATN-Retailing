@@ -16,6 +16,8 @@ checks for customers:
         cstmr_job_title: string
 - row_count > 0:
     name: customers should contain data
+- duplicate_count(cstmr_id) = 0:
+    name: (cstmr_id) must be unique
 - missing_count(cstmr_id) = 0:
     name: Customer ID must not be null
 - invalid_count(cstmr_eml) = 0:
