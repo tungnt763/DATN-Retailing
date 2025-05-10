@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS `datn-retailing.edw.dim_customers` (
+    cstmr_surr_key            STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Customer Surrogate Key\", \"clmn_desc\": \"Customer Surrogate Key of the dim_customers table\"}"),
+    cstmr_id                  STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Customer ID\", \"clmn_desc\": \"Customer ID of the dim_customers table\"}"),
+    cstmr_name                STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Name\", \"clmn_desc\": \"Name of the dim_customers table\"}"),
+    cstmr_eml                 STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Email\", \"clmn_desc\": \"Email of the dim_customers table\"}"),
+    cstmr_tel                 STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Telephone\", \"clmn_desc\": \"Telephone of the dim_customers table\"}"),
+    cstmr_city                STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"City\", \"clmn_desc\": \"City of the dim_customers table\"}"),
+    cstmr_cntry               STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Country\", \"clmn_desc\": \"Country of the dim_customers table\"}"),
+    cstmr_gender              STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Gender\", \"clmn_desc\": \"Gender of the dim_customers table\"}"),
+    cstmr_brthdy              DATE  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Date of Birth\", \"clmn_desc\": \"Date of Birth of the dim_customers table\"}"),
+    cstmr_job_title           STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Job Title\", \"clmn_desc\": \"Job Title of the dim_customers table\"}"),
+    effective_start_date      TIMESTAMP OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Effective Start Date\", \"clmn_desc\": \"Effective start date (timestamp) of the record\"}"),
+    effective_end_date        TIMESTAMP OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Effective End Date\", \"clmn_desc\": \"Effective end date (timestamp) of the record\"}"),
+    flag_active               STRING OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Flag Active\", \"clmn_desc\": \"Flag to indicate if the record is active\"}"),
+    create_date               TIMESTAMP OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Create Date\", \"clmn_desc\": \"Timestamp when record was created in cleaned layer\"}"),
+    create_task_id            STRING OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Create Task Id\", \"clmn_desc\": \"Airflow task ID that created this record\"}"),
+    create_task_run_id        STRING OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Create Task Run Id\", \"clmn_desc\": \"Airflow run ID that created this record\"}"),
+    update_date               TIMESTAMP OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Update Date\", \"clmn_desc\": \"Timestamp when record was updated in cleaned layer\"}"),
+    update_task_id            STRING OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Update Task Id\", \"clmn_desc\": \"Airflow task ID that updated this record\"}"),
+    update_task_run_id        STRING OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Update Task Run Id\", \"clmn_desc\": \"Airflow run ID that updated this record\"}")
+);

@@ -3,8 +3,8 @@ import os
 import yaml
 
 # Configuration
-DATASET = "edw_cleaned"
-METADATA = "clean_layer_table_info"
+DATASET = "edw"
+METADATA = "edw_layer_table_info"
 METADATA_PATH = f"/Users/tungnt763/Documents/DATN-Retailing/dags/config/{METADATA}.json"
 OUTPUT_DIR = f"/Users/tungnt763/Documents/DATN-Retailing/include/soda/{DATASET}/checks/sources"
 TABLE_NAME_SUFFIX = "_temp" if DATASET == "edw_loaded" else ""
@@ -93,7 +93,7 @@ def generate_checks(table_name, table_info):
 
         # Format validity
         fmt = col.get("format", "").strip().lower()
-        if fmt in SODA_FORMATS and col.get("type") == "STRING":
+        if fmt in SODA_FORMATS and col.get("type") == "STRING" and DATASET != "edw":
             checks[f"checks for {table_name}{TABLE_NAME_SUFFIX}"].append({
                 f"invalid_count({name}) = 0": {
                     "name": f"{logic_name} must match format",
@@ -102,7 +102,7 @@ def generate_checks(table_name, table_info):
             })
 
         # Regex validity
-        if col.get("regax") and col.get("type") == "STRING":
+        if col.get("regax") and col.get("type") == "STRING" and DATASET != "edw":
             checks[f"checks for {table_name}{TABLE_NAME_SUFFIX}"].append({
                 f"invalid_count({name}) = 0": {
                     "name": f"{logic_name} regex validation",
@@ -111,7 +111,7 @@ def generate_checks(table_name, table_info):
             })
 
         # Enum values validity
-        if isinstance(col.get("values"), list) and col["values"]:
+        if isinstance(col.get("values"), list) and col["values"] and DATASET != "edw":
             allowed = LiteralStr("\n".join(f"- {v}" for v in col["values"]))
             checks[f"checks for {table_name}{TABLE_NAME_SUFFIX}"].append({
                 f"invalid_percent({name}) = 0": {
@@ -138,7 +138,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Generate YAML files
 for table_name, table_info in metadata.items():
-    checks = generate_checks(table_name, table_info)
+    checks = generate_checks(table_info["physical_name"], table_info)
     with open(os.path.join(OUTPUT_DIR, f"check_{table_name}.yml"), "w") as f:
         yaml.dump(checks, f, sort_keys=False, default_flow_style=False)
 

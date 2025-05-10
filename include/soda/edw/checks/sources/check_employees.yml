@@ -1,0 +1,19 @@
+checks for dim_employees:
+- schema:
+    fail:
+      when required column missing:
+      - emply_surr_key
+      - emply_id
+      when wrong column type:
+        emply_surr_key: string
+        emply_id: string
+        emply_name: string
+        emply_pstn: string
+- row_count > 0:
+    name: dim_employees should contain data
+- duplicate_count(emply_surr_key) = 0:
+    name: (emply_surr_key) must be unique
+- missing_count(emply_surr_key) = 0:
+    name: Employee Surrogate Key must not be null
+- missing_count(emply_id) = 0:
+    name: Employee ID must not be null

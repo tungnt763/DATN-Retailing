@@ -131,14 +131,13 @@ def get_unix_timestamp_from_filename(filename: str) -> int:
 
 # >>>>> Cleaned layer <<<<<
 
-def get_clean_expressions_for_table(table_name, metadata_file_name):
+def get_clean_expressions_for_table(table_name, metadata_file_name, input_dataset, output_dataset, project_name):
     metadata = read_metadata(metadata_file_name)
 
     columns = metadata[table_name]["columns"]
-    cleaned_exprs = []
-    selected_cols = []
-    pk_cols = []
-    cols = []
+    cleaned_column_expressions = []
+    selected_columns = []
+    pk_expr = []
 
     for col in columns:
         name = col["physical_name"]
@@ -189,14 +188,64 @@ def get_clean_expressions_for_table(table_name, metadata_file_name):
         else:
             expr = f"{cast} AS {name}"
 
-        cols.append(name)
-        cleaned_exprs.append(expr)
-        selected_cols.append(name)
+        cleaned_column_expressions.append(expr)
+        selected_columns.append(name)
         if is_pk:
-            pk_cols.append(name)
+            pk_expr.append(name)
 
-    selected_cols += ["loaded_batch", "loaded_part", "batch_load_ts"]
-    if not pk_cols:
-        pk_cols = cols
+    if not pk_expr:
+        pk_expr = selected_columns
+    selected_columns += ["loaded_batch", "loaded_part", "batch_load_ts"]
 
-    return [cleaned_exprs, selected_cols, pk_cols, cols]
+    return {
+        "project_name": project_name,
+        "input_dataset": input_dataset,
+        "output_dataset": output_dataset,
+        "table_name": table_name,
+        "cleaned_column_expressions": ',\n        '.join(cleaned_column_expressions),
+        "columns": ',\n        '.join(selected_columns),
+        "selected_columns": ',\n    '.join(selected_columns),
+        "pk_expr": ', '.join(pk_expr),
+    }
+
+# >>>>>   EDW layer   <<<<<
+def get_edw_expressions_for_table(table_name, metadata_file_name, input_dataset, output_dataset, project_name):
+    import json
+    from pathlib import Path
+
+    # Load JSON data
+    metadata = read_metadata(metadata_file_name)
+
+    table_info = metadata[table_name]
+    columns = table_info["columns"]
+
+    old_columns = ",\n    ".join([col["physical_name"] if col["method"] == "" else f"{col['method']} AS {col['physical_name']}" for col in columns if col["pk"] != "Y"])
+    old_columns_in_row = ", ".join([col["physical_name"] for col in columns if col["pk"] != "Y"])
+    old_columns_except_method = ",\n    ".join([col["physical_name"] for col in columns if col["pk"] != "Y"])
+
+    natural_keys = [col["physical_name"] for col in columns if col["nk"] == "Y"]
+    natural_key_expr = "\n        AND ".join([f"target.{nk} = source.{nk}" for nk in natural_keys])
+
+    columns_except_natural_key_expr = ",\n        ".join([f"{col['physical_name']} = source.{col['physical_name']}" for col in columns if col["pk"] != "Y" and col["nk"] != "Y"])
+
+    columns_except_natural_key_diff_expr = "\n        OR ".join([f"target.{col['physical_name']} != source.{col['physical_name']}" for col in columns if col["pk"] != "Y" and col["nk"] != "Y"])
+
+    new_columns = ", ".join([col["physical_name"] for col in columns])
+
+    params = {
+        "project_name": project_name,
+        "input_dataset": input_dataset,
+        "input_table": table_name,
+        "output_dataset": output_dataset,
+        "output_table": table_info["physical_name"],
+        "old_columns": old_columns,
+        "old_columns_in_row": old_columns_in_row,
+        "old_columns_except_method": old_columns_except_method,
+        "natural_key_expr": natural_key_expr,
+        "columns_except_natural_key_diff_expr": columns_except_natural_key_diff_expr,
+        "columns_except_natural_key_expr": columns_except_natural_key_expr,
+        "new_columns": new_columns,
+        "scd_type": table_info["scd_type"],
+    }
+
+    return params

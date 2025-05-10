@@ -13,17 +13,12 @@ WITH cleaned_data AS (
     WHERE
         create_date > TIMESTAMP('{{ task_instance.xcom_pull(task_ids="loading_layer.get_max_timestamp", key="max_timestamp") }}')
 ),
-
 deduplicated_valid_data AS (
     SELECT 
         {{ params.columns }},
-        loaded_batch,
-        loaded_part,
-        batch_load_ts,
         ROW_NUMBER() OVER (PARTITION BY {{ params.pk_expr }} ORDER BY batch_load_ts DESC) AS row_num
     FROM cleaned_data
 )
-
 SELECT 
     {{ params.selected_columns }},
     CURRENT_TIMESTAMP() AS create_date,

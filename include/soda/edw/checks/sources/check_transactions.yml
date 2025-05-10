@@ -1,0 +1,76 @@
+checks for fact_transactions:
+- schema:
+    fail:
+      when required column missing:
+      - trn_id
+      - trn_hr
+      - trn_dt_key
+      - trn_cstmr_key
+      - trn_prd_key
+      - trn_str_key
+      - trn_emply_key
+      - trn_dscnt_key
+      - trn_sale_qty
+      - trn_reg_unit_prc
+      - trn_dscnt_unit_prc
+      - trn_net_unit_prc
+      - trn_ext_sale_dol
+      - trn_ext_dscnt_dol
+      - trn_line_ttl
+      when wrong column type:
+        trn_id: string
+        trn_hr: int64
+        trn_dt_key: string
+        trn_cstmr_key: string
+        trn_prd_key: string
+        trn_str_key: string
+        trn_emply_key: string
+        trn_dscnt_key: string
+        trn_sale_qty: int64
+        trn_reg_unit_prc: numeric
+        trn_dscnt_unit_prc: numeric
+        trn_net_unit_prc: numeric
+        trn_ext_sale_dol: numeric
+        trn_ext_dscnt_dol: numeric
+        trn_line_ttl: numeric
+        trn_sz: string
+        trn_cl: string
+        trn_crncy: string
+        trn_crncy_sbl: string
+        trn_type: string
+        trn_pymnt_mthd: string
+        trn_sku: string
+- row_count > 0:
+    name: fact_transactions should contain data
+- duplicate_count(trn_id) = 0:
+    name: (trn_id) must be unique
+- missing_count(trn_id) = 0:
+    name: Transaction ID must not be null
+- missing_count(trn_hr) = 0:
+    name: Transaction Hour must not be null
+- missing_count(trn_dt_key) = 0:
+    name: Date Key must not be null
+- missing_count(trn_cstmr_key) = 0:
+    name: Customer Key must not be null
+- missing_count(trn_prd_key) = 0:
+    name: Product Key must not be null
+- missing_count(trn_str_key) = 0:
+    name: Store Key must not be null
+- missing_count(trn_emply_key) = 0:
+    name: Employee Key must not be null
+- missing_count(trn_dscnt_key) = 0:
+    name: Discount Key must not be null
+- missing_count(trn_sale_qty) = 0:
+    name: Sale Quantity must not be null
+- missing_count(trn_reg_unit_prc) = 0:
+    name: Regular Unit Price must not be null
+- missing_count(trn_dscnt_unit_prc) = 0:
+    name: Discount Unit Price  must not be null
+- missing_count(trn_net_unit_prc) = 0:
+    name: Net Unit Price must not be null
+- missing_count(trn_ext_sale_dol) = 0:
+    name: Extended Sales Dollar Amount must not be null
+- missing_count(trn_ext_dscnt_dol) = 0:
+    name: Extended Discount Dollar Amount must not be null
+- missing_count(trn_line_ttl) = 0:
+    name: Line Total must not be null

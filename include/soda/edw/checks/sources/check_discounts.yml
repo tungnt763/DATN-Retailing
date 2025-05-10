@@ -1,0 +1,25 @@
+checks for dim_discounts:
+- schema:
+    fail:
+      when required column missing:
+      - dscnt_surr_key
+      - dscnt_start_date
+      - dscnt_value
+      when wrong column type:
+        dscnt_surr_key: string
+        dscnt_start_date: date
+        dscnt_end_date: date
+        dscnt_value: numeric
+        dscnt_desc: string
+        dscnt_ctgry: string
+        dscnt_sub_ctgry: string
+- row_count > 0:
+    name: dim_discounts should contain data
+- duplicate_count(dscnt_surr_key) = 0:
+    name: (dscnt_surr_key) must be unique
+- missing_count(dscnt_surr_key) = 0:
+    name: Discount Surrogate Key must not be null
+- missing_count(dscnt_start_date) = 0:
+    name: Start Date must not be null
+- missing_count(dscnt_value) = 0:
+    name: Discount must not be null

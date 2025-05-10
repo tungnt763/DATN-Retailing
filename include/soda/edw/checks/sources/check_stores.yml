@@ -1,0 +1,31 @@
+checks for dim_stores:
+- schema:
+    fail:
+      when required column missing:
+      - str_surr_key
+      - str_id
+      - str_lat
+      - str_lon
+      when wrong column type:
+        str_surr_key: string
+        str_id: string
+        str_cntry: string
+        str_city: string
+        str_name: string
+        str_emply_num: int64
+        str_zip_cd: string
+        str_sz: string
+        str_lat: numeric
+        str_lon: numeric
+- row_count > 0:
+    name: dim_stores should contain data
+- duplicate_count(str_surr_key) = 0:
+    name: (str_surr_key) must be unique
+- missing_count(str_surr_key) = 0:
+    name: Store Surrogate Key must not be null
+- missing_count(str_id) = 0:
+    name: Store ID must not be null
+- missing_count(str_lat) = 0:
+    name: Latitude must not be null
+- missing_count(str_lon) = 0:
+    name: Longitude must not be null
