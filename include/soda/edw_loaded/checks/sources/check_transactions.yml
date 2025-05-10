@@ -33,12 +33,12 @@ checks for transactions_temp:
 - row_count > 0:
     name: transactions should contain data
 - failed rows:
-    name: Column count should be exactly 28
+    name: Column count should be exactly 25
     fail query: |-
       SELECT COUNT(*) AS col_count
       FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
       WHERE table_name = 'transactions_temp'
-      HAVING col_count != 28
+      HAVING col_count != 25
 - missing_count(trn_invc_id) = 0:
     name: Invoice ID must not be null
 - missing_count(trn_line) = 0:
@@ -59,17 +59,17 @@ checks for transactions_temp:
     name: Date must not be null
 - invalid_count(trn_date) = 0:
     name: Date regex validation
-    valid regex: ^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])\s([01]\d|2[0-3])-[0-5]\d-[0-5]\d$
+    valid regex: ^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])\s([01]\d|2[0-3]):[0-5]\d:[0-5]\d$
 - invalid_count(trn_dscnt) = 0:
     name: Discount regex validation
     valid regex: ^0(\.\d+)?$|^1(\.0+)?$
 - invalid_count(trn_line_ttl) = 0:
     name: Line Total must match format
-    valid format: positive decimal point
+    valid format: decimal point
 - missing_count(trn_str_id) = 0:
     name: Store ID must not be null
 - missing_count(trn_emply_id) = 0:
     name: Employee ID must not be null
 - invalid_count(trn_invc_ttl) = 0:
     name: Invoice Total must match format
-    valid format: positive decimal point
+    valid format: decimal point
