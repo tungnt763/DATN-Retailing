@@ -24,6 +24,8 @@ x-airflow-common:
   depends_on:
     - postgres
     - redis
+  env_file:
+    - .env
 
 services:
   postgres:

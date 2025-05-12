@@ -913,5 +913,102 @@
         "default_value": "0.0"
       }
     ]
+  },
+  "currency": {
+    "physical_name": "currency",
+    "logical_name_en": "Currency",
+    "col_nums": "6",
+    "columns": [
+      {
+        "logical_name_en": "Currency Code",
+        "physical_name": "crncy_cd",
+        "type": "STRING",
+        "index": "1",
+        "pk": "Y",
+        "mode": "REQUIRED",
+        "format": "upper",
+        "min": "",
+        "max": "",
+        "values": [],
+        "regax": "^[A-Z]{3}$",
+        "other": "",
+        "default_value": ""
+      },
+      {
+        "logical_name_en": "Currency Name",
+        "physical_name": "crncy_name",
+        "type": "STRING",
+        "index": "2",
+        "pk": "N",
+        "mode": "NULLABLE",
+        "format": "",
+        "min": "",
+        "max": "",
+        "values": [],
+        "regax": "",
+        "other": "",
+        "default_value": "Unknown"
+      },
+      {
+        "logical_name_en": "Currency Symbol",
+        "physical_name": "crncy_sbl",
+        "type": "STRING",
+        "index": "3",
+        "pk": "N",
+        "mode": "NULLABLE",
+        "format": "upper",
+        "min": "",
+        "max": "",
+        "values": [],
+        "regax": "",
+        "other": "",
+        "default_value": "Unknown"
+      },
+      {
+        "logical_name_en": "Rate to USD",
+        "physical_name": "crncy_rt_usd",
+        "type": "NUMERIC",
+        "index": "4",
+        "pk": "N",
+        "mode": "REQUIRED",
+        "format": "positive decimal point",
+        "min": "",
+        "max": "",
+        "values": [],
+        "regax": "",
+        "other": "",
+        "default_value": "1.0"
+      },
+      {
+        "logical_name_en": "Rate Date",
+        "physical_name": "crncy_rt_dt",
+        "type": "DATE",
+        "index": "5",
+        "pk": "N",
+        "mode": "REQUIRED",
+        "format": "date inverse",
+        "min": "",
+        "max": "",
+        "values": [],
+        "regax": "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$",
+        "other": "",
+        "default_value": "1900-01-01"
+      },
+      {
+        "logical_name_en": "Base Currency",
+        "physical_name": "crncy_base",
+        "type": "STRING",
+        "index": "6",
+        "pk": "N",
+        "mode": "REQUIRED",
+        "format": "upper",
+        "min": "",
+        "max": "",
+        "values": [],
+        "regax": "^[A-Z]{3}$",
+        "other": "",
+        "default_value": "USD"
+      }
+    ]
   }
 }

@@ -3,8 +3,8 @@ import os
 import yaml
 
 # Configuration
-DATASET = "edw"
-METADATA = "edw_layer_table_info"
+DATASET = "edw_loaded"
+METADATA = "load_layer_table_info"
 METADATA_PATH = f"/Users/tungnt763/Documents/DATN-Retailing/dags/config/{METADATA}.json"
 OUTPUT_DIR = f"/Users/tungnt763/Documents/DATN-Retailing/include/soda/{DATASET}/checks/sources"
 TABLE_NAME_SUFFIX = "_temp" if DATASET == "edw_loaded" else ""

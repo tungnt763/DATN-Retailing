@@ -7,10 +7,10 @@ from airflow.operators.empty import EmptyOperator
 from airflow.providers.google.cloud.transfers.local_to_gcs import LocalFilesystemToGCSOperator
 from airflow.sensors.filesystem import FileSensor
 from airflow.utils.task_group import TaskGroup
-from lib.utils import archive_file
+from lib.utils import archive_file, get_table_names
 
 DATA_FOLDER = os.path.join(os.getenv('AIRFLOW_HOME', '/opt/airflow/'), 'include', 'dataset')
-TABLE_NAMES = ['customers', 'discounts', 'employees', 'products', 'stores', 'transactions']
+TABLE_NAMES = get_table_names()
 
 default_args = {
     'depends_on_past': False,
@@ -29,7 +29,7 @@ def decide_branch(file_path_pattern, upload_task_id, alert_task_id, **kwargs):
         return alert_task_id
 
 @dag(
-    schedule_interval='0 0 * * *',
+    schedule_interval='30 0 * * *',
     start_date=datetime(2023, 1, 1),
     catchup=False,
     default_args=default_args,

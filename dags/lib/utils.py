@@ -161,7 +161,10 @@ def get_clean_expressions_for_table(table_name, metadata_file_name, input_datase
         elif typ == "DATETIME":
             cast = f"SAFE.PARSE_DATETIME('%Y-%m-%d %H-%M-%S', {base})"
         else:
-            cast = f"INITCAP({base})"
+            if col.get("format") == "upper":
+                cast = f"UPPER({base})"
+            else:
+                cast = f"INITCAP({base})"
 
         if not nullable and default:
             if typ in ["NUMERIC", "FLOAT64", "INT64"]:

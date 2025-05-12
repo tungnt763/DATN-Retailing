@@ -3,8 +3,8 @@ from airflow.decorators import dag, task, task_group
 from datetime import datetime, timedelta, timezone
 from airflow.providers.google.cloud.sensors.gcs import GCSObjectsWithPrefixExistenceSensor
 from resources.business.task_group_loading_layer import loading_layer
-from resources.business.task_group_cleaned_layer import clean_layer
-from resources.business.task_group_edw_layer import edw_layer
+from resources.business.dim.task_group_cleaned_layer import clean_layer
+from resources.business.dim.task_group_edw_layer import edw_layer
 from resources.python_task.archive_files_task import archive_gcs_files
 from lib.utils import load_db_env, get_table_names
 
@@ -70,7 +70,7 @@ for _table_name in _table_names:
         continue
 
     _dag_id = f'dag_{_table_name}'
-    _schedule = '0 0 * * *'
+    _schedule = '0 1 * * *'
 
     config = {
         'dag_id': _dag_id,

@@ -9,7 +9,7 @@ CREATE TEMP TABLE cleaned_data AS
 SELECT
     GENERATE_UUID() AS surr_key,
     {{ params.old_columns }},
-    CURRENT_TIMESTAMP() AS effective_start_date,
+    TIMESTAMP('1900-01-01 00:00:00') AS effective_start_date,
     TIMESTAMP('9999-12-31 23:59:59') AS effective_end_date,
     '1' AS flag_active,
     create_date,

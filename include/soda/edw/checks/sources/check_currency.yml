@@ -1,0 +1,31 @@
+checks for dim_currency:
+- schema:
+    fail:
+      when required column missing:
+      - crncy_surr_key
+      - crncy_cd
+      - crncy_rt_usd
+      - crncy_rt_dt
+      - crncy_base
+      when wrong column type:
+        crncy_surr_key: string
+        crncy_cd: string
+        crncy_name: string
+        crncy_sbl: string
+        crncy_rt_usd: numeric
+        crncy_rt_dt: date
+        crncy_base: string
+- row_count > 0:
+    name: dim_currency should contain data
+- duplicate_count(crncy_surr_key) = 0:
+    name: (crncy_surr_key) must be unique
+- missing_count(crncy_surr_key) = 0:
+    name: Currency Surrogate Key must not be null
+- missing_count(crncy_cd) = 0:
+    name: Currency Code must not be null
+- missing_count(crncy_rt_usd) = 0:
+    name: Rate to USD must not be null
+- missing_count(crncy_rt_dt) = 0:
+    name: Rate Date must not be null
+- missing_count(crncy_base) = 0:
+    name: Base Currency must not be null

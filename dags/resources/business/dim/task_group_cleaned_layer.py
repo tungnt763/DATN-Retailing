@@ -16,7 +16,7 @@ def clean_layer(**kwargs):
 
     _gcp_conn_id = kwargs.get('gcp_conn_id')
 
-    _sql_template = os.path.join("resources", "sql_template", _output_dataset, "insert_cleaned_transformed_data_to_table.sql")
+    _sql_template = os.path.join("resources", "sql_template", _output_dataset, "dim", "insert_cleaned_transformed_data_to_table.sql")
 
     params = get_clean_expressions_for_table(_table_name, 'clean_layer_table_info', _input_dataset, _output_dataset, _project_name)
 

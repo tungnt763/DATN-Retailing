@@ -849,5 +849,98 @@
         "default_value": "Unknown"
       }
     ]
+  },
+  "currency": {
+    "physical_name": "dim_currency",
+    "table_type": "dimension",
+    "scd_type": "scd2",
+    "logical_name_en": "Dim Currency",
+    "col_nums": "7",
+    "columns": [
+      {
+        "logical_name_en": "Currency Surrogate Key",
+        "physical_name": "crncy_surr_key",
+        "type": "STRING",
+        "index": "1",
+        "pk": "Y",
+        "nk": "N",
+        "mode": "REQUIRED",
+        "method": "",
+        "other": "",
+        "default_value": ""
+      },
+      {
+        "logical_name_en": "Currency Code",
+        "physical_name": "crncy_cd",
+        "type": "STRING",
+        "index": "2",
+        "pk": "N",
+        "nk": "Y",
+        "mode": "REQUIRED",
+        "method": "",
+        "other": "",
+        "default_value": ""
+      },
+      {
+        "logical_name_en": "Currency Name",
+        "physical_name": "crncy_name",
+        "type": "STRING",
+        "index": "3",
+        "pk": "N",
+        "nk": "N",
+        "mode": "NULLABLE",
+        "method": "",
+        "other": "",
+        "default_value": "Unknown"
+      },
+      {
+        "logical_name_en": "Currency Symbol",
+        "physical_name": "crncy_sbl",
+        "type": "STRING",
+        "index": "4",
+        "pk": "N",
+        "nk": "N",
+        "mode": "NULLABLE",
+        "method": "",
+        "other": "",
+        "default_value": "Unknown"
+      },
+      {
+        "logical_name_en": "Rate to USD",
+        "physical_name": "crncy_rt_usd",
+        "type": "NUMERIC",
+        "index": "5",
+        "pk": "N",
+        "nk": "N",
+        "mode": "REQUIRED",
+        "method": "",
+        "other": "",
+        "default_value": "1.0"
+      },
+      {
+        "logical_name_en": "Rate Date",
+        "physical_name": "crncy_rt_dt",
+        "type": "DATE",
+        "index": "6",
+        "pk": "N",
+        "nk": "N",
+        "mode": "REQUIRED",
+        "method": "",
+        "other": "",
+        "default_value": "1900-01-01"
+      },
+      {
+        "logical_name_en": "Base Currency",
+        "physical_name": "crncy_base",
+        "type": "STRING",
+        "index": "7",
+        "pk": "N",
+        "nk": "N",
+        "mode": "REQUIRED",
+        "method": "",
+        "other": "",
+        "default_value": "USD"
+      }
+    ]
   }
 }
