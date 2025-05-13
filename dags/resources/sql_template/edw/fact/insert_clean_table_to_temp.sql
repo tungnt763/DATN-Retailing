@@ -1,0 +1,35 @@
+INSERT INTO `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.output_table }}_temp`
+SELECT
+    -- CONCAT(trn_invc_id,'_',trn_line) AS trn_id,
+    -- FORMAT_TIMESTAMP('%H:%M:%S', trn_date) AS trn_hr,
+    -- FORMAT_TIMESTAMP('%Y%m%d', trn_date) AS trn_dt_key,
+    -- cstmr_surr_key AS trn_cstmr_key,
+    -- prd_surr_key AS trn_prd_key,
+    -- str_surr_key AS trn_str_key,
+    -- emply_surr_key AS trn_emply_key,
+    -- dscnt_surr_key AS trn_dscnt_key,
+    -- crncy_surr_key AS trn_crncy_key,
+    -- trn_qty AS trn_sale_qty,
+    -- trn_unit_prc AS trn_reg_unit_prc,
+    -- ROUND(trn_unit_prc * trn_dscnt, 2) AS trn_dscnt_unit_prc,
+    -- ROUND(trn_unit_prc * (1 - trn_dscnt), 2) AS trn_net_unit_prc,
+    -- ROUND(trn_unit_prc * (1 - trn_dscnt) * trn_qty, 2) AS trn_ext_sale_dol,
+    -- ROUND(trn_unit_prc * trn_dscnt * trn_qty, 2) AS trn_ext_dscnt_dol,
+    -- ROUND(prd_cost * trn_qty, 2) AS trn_ext_cost_dol,
+    -- ROUND(trn_unit_prc * (1 - trn_dscnt) * trn_qty - prd_cost * trn_qty, 2) AS trn_ext_grs_prft_dol,
+    -- trn_line_ttl AS trn_line_ttl,
+    -- trn_sz AS trn_sz,
+    -- trn_cl AS trn_cl,
+    -- trn_type AS trn_type,
+    -- trn_pymnt_mthd AS trn_pymnt_mthd,
+    {{ params.select_columns_method }},
+    CURRENT_TIMESTAMP() AS create_date,
+    '{{ task_instance.task_id }}' AS create_task_id,
+    '{{ task_instance.run_id }}' AS create_task_run_id,
+    CURRENT_TIMESTAMP() AS update_date,
+    '{{ task_instance.task_id }}' AS update_task_id,
+    '{{ task_instance.run_id }}' AS update_task_run_id,
+    '1'
+FROM `{{ params.project_name }}.{{ params.input_dataset }}.{{ params.input_table }}`
+WHERE
+    create_date > TIMESTAMP('{{ task_instance.xcom_pull(task_ids="cleaning_layer.get_max_timestamp", key="max_timestamp") }}');

@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}_temp`;
