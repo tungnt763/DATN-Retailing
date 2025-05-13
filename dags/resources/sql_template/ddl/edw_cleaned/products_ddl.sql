@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `datn-retailing.edw_cleaned.products` (
     prd_id                    STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Product ID\", \"clmn_desc\": \"Product ID of the products table\"}"),
     prd_ctgry                 STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Category\", \"clmn_desc\": \"Category of the products table\"}"),
-    prd_sub_ctgry             STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Sub Category\", \"clmn_desc\": \"Sub Category of the products table\"}"),
+    prd_sub_ctgry             STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Sub Category\", \"clmn_desc\": \"Sub Category of the products table\"}"),
     prd_desc_pt               STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Description PT\", \"clmn_desc\": \"Description PT of the products table\"}"),
     prd_desc_de               STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Description DE\", \"clmn_desc\": \"Description DE of the products table\"}"),
     prd_desc_fr               STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Description FR\", \"clmn_desc\": \"Description FR of the products table\"}"),

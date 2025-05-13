@@ -97,12 +97,12 @@ handled_null_table AS (
       CASE WHEN trn_invc_id LIKE 'INV%' THEN t.trn_unit_prc * (1 - t.trn_dscnt) * t.trn_qty
       ELSE -1 * t.trn_unit_prc * (1 - t.trn_dscnt) * t.trn_qty END
       )) OVER (PARTITION BY t.trn_invc_id) AS expt_invc_ttl,
-    loaded_batch,
-    loaded_part,
-    batch_load_ts,
-    create_date,
-    create_task_id,
-    create_task_run_id
+    t.loaded_batch,
+    t.loaded_part,
+    t.batch_load_ts,
+    t.create_date,
+    t.create_task_id,
+    t.create_task_run_id
   FROM
     deduplicated_table AS t
   LEFT JOIN `datn-retailing.edw.dim_customers` AS ctm

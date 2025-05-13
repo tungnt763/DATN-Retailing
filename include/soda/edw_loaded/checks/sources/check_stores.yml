@@ -30,5 +30,11 @@ checks for stores_temp:
     valid format: positive integer
 - missing_count(str_lat) = 0:
     name: Latitude must not be null
+- invalid_count(str_lat) = 0:
+    name: Latitude must match format
+    valid format: decimal point
 - missing_count(str_lon) = 0:
     name: Longitude must not be null
+- invalid_count(str_lon) = 0:
+    name: Longitude must match format
+    valid format: decimal point

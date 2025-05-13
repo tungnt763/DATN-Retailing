@@ -4,6 +4,7 @@ checks for products:
       when required column missing:
       - prd_id
       - prd_ctgry
+      - prd_sub_ctgry
       - prd_cost
       when wrong column type:
         prd_id: string
@@ -26,5 +27,7 @@ checks for products:
     name: Product ID must not be null
 - missing_count(prd_ctgry) = 0:
     name: Category must not be null
+- missing_count(prd_sub_ctgry) = 0:
+    name: Sub Category must not be null
 - missing_count(prd_cost) = 0:
     name: Production Cost must not be null

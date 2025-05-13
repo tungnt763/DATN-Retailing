@@ -1,6 +1,7 @@
 from airflow.decorators import task
 from airflow.utils.email import send_email
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
+from datetime import datetime
 
 @task
 def check_invalid_rows_and_notify(table_name, dataset_name, project_name, gcp_conn_id, developer_email):
@@ -72,7 +73,7 @@ def check_invalid_rows_and_notify(table_name, dataset_name, project_name, gcp_co
         🔎 <strong>Details:</strong><br>
         - Project: <code>{project_name}</code><br>
         - Dataset: <code>{dataset_name}</code><br>
-        - Table: <code>{table_name}_invalid_data</code><br><br>
+        - Table: <code>{table_name}_invalid</code><br><br>
         If you believe this is unexpected, please check the data transformation logic or upstream source.
         </div>
         <div class="footer">

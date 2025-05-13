@@ -92,14 +92,15 @@ def clean_layer(**kwargs):
 
     max_timestamp = get_max_timestamp_task(gcp_conn_id=_gcp_conn_id, dataset_name=_output_dataset, table_name=_table_name)
 
-    max_timestamp >> clean_transform_data_task >> [insert_cleaned_transformed_data_to_table_task, insert_invalid_data_to_table_task] 
+    dqc = data_quality_check.override(task_id=f'data_quality_check_{_table_name}')(_table_name, _output_dataset)
 
-    insert_cleaned_transformed_data_to_table_task >> drop_temp_table_task
+    insert_job = insert_job_task.override(task_id=f'insert_cleaned_{_table_name}_job_to_log')(gcp_conn_id=_gcp_conn_id, dataset_name=_output_dataset, table_name=_table_name)
+
+    # Dependencies
+    max_timestamp >> clean_transform_data_task >> [insert_cleaned_transformed_data_to_table_task, insert_invalid_data_to_table_task] 
 
     insert_invalid_data_to_table_task >> [check_invalid_rows_and_notify_task, drop_temp_table_task]
 
-    # dqc = data_quality_check.override(task_id=f'data_quality_check_{_table_name}')(_table_name, _output_dataset)
-
-    # insert_job = insert_job_task.override(task_id=f'insert_cleaned_{_table_name}_job_to_log')(gcp_conn_id=_gcp_conn_id, dataset_name=_output_dataset, table_name=_table_name)
-
-    # max_timestamp >> insert_cleaned_data_to_table >> dqc >> insert_job
+    insert_cleaned_transformed_data_to_table_task >> [drop_temp_table_task, dqc]
+    
+    [check_invalid_rows_and_notify_task, dqc, drop_temp_table_task] >> insert_job

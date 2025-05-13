@@ -8,6 +8,7 @@ checks for transactions:
       - trn_prd_id
       - trn_qty
       - trn_date
+      - trn_dscnt
       - trn_str_id
       - trn_emply_id
       when wrong column type:
@@ -19,7 +20,7 @@ checks for transactions:
         trn_cl: string
         trn_unit_prc: numeric
         trn_qty: int64
-        trn_date: datetime
+        trn_date: timestamp
         trn_dscnt: numeric
         trn_line_ttl: numeric
         trn_str_id: string
@@ -46,6 +47,8 @@ checks for transactions:
     name: Quantity must not be null
 - missing_count(trn_date) = 0:
     name: Date must not be null
+- missing_count(trn_dscnt) = 0:
+    name: Discount must not be null
 - missing_count(trn_str_id) = 0:
     name: Store ID must not be null
 - missing_count(trn_emply_id) = 0:

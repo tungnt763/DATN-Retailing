@@ -6,10 +6,13 @@ checks for transactions_temp:
       - trn_line
       - trn_cstmr_id
       - trn_prd_id
+      - trn_unit_prc
       - trn_qty
       - trn_date
+      - trn_dscnt
       - trn_str_id
       - trn_emply_id
+      - trn_crncy
       when wrong column type:
         trn_invc_id: string
         trn_line: string
@@ -47,6 +50,8 @@ checks for transactions_temp:
     name: Customer ID must not be null
 - missing_count(trn_prd_id) = 0:
     name: Product ID must not be null
+- missing_count(trn_unit_prc) = 0:
+    name: Unit Price must not be null
 - invalid_count(trn_unit_prc) = 0:
     name: Unit Price must match format
     valid format: positive decimal point
@@ -60,6 +65,8 @@ checks for transactions_temp:
 - invalid_count(trn_date) = 0:
     name: Date regex validation
     valid regex: ^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])\s([01]\d|2[0-3]):[0-5]\d:[0-5]\d$
+- missing_count(trn_dscnt) = 0:
+    name: Discount must not be null
 - invalid_count(trn_dscnt) = 0:
     name: Discount regex validation
     valid regex: ^0(\.\d+)?$|^1(\.0+)?$
@@ -70,6 +77,8 @@ checks for transactions_temp:
     name: Store ID must not be null
 - missing_count(trn_emply_id) = 0:
     name: Employee ID must not be null
+- missing_count(trn_crncy) = 0:
+    name: Currency must not be null
 - invalid_count(trn_invc_ttl) = 0:
     name: Invoice Total must match format
     valid format: decimal point

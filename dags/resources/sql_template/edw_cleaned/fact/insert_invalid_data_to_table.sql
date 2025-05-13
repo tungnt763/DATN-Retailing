@@ -8,11 +8,10 @@ INSERT INTO `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.tab
 SELECT
     *
 FROM `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}_temp`
-WHERE NOT(
-    is_valid_cstmr_id
-    AND is_valid_prd_id
-    AND is_valid_dscnt_id
-    AND is_valid_line_ttl
-    AND is_valid_str_id
-    AND is_valid_emply_id
-)
+WHERE 
+    is_valid_cstmr_id = false
+    OR is_valid_prd_id = false
+    OR is_valid_dscnt_id = false
+    OR is_valid_line_ttl = false
+    OR is_valid_str_id = false
+    OR is_valid_emply_id = false;
