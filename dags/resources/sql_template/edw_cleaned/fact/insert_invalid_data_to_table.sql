@@ -1,4 +1,4 @@
-CREATE IF NOT EXISTS TABLE `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}_invalid` AS
+CREATE TABLE IF NOT EXISTS `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}_invalid` AS
 SELECT
     *
 FROM `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}_temp`

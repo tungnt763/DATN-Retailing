@@ -1,6 +1,8 @@
+TRUNCATE TABLE `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}`;
+
 INSERT INTO `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}`
 SELECT 
-    {{ params.columns }},
+    {{ params.col_names }},
     loaded_batch,
     loaded_part,
     batch_load_ts,

@@ -3,7 +3,7 @@ from airflow.decorators import dag, task, task_group
 from datetime import datetime, timedelta, timezone
 from airflow.providers.google.cloud.sensors.gcs import GCSObjectsWithPrefixExistenceSensor
 from resources.business.task_group_loading_layer import loading_layer
-# from resources.business.task_group_cleaned_layer import clean_layer
+from resources.business.fact.task_group_cleaned_layer import clean_layer
 # from resources.business.task_group_edw_layer import edw_layer
 from lib.utils import load_db_env
 
@@ -52,11 +52,11 @@ def create_dag(_dag_id, _schedule, **kwargs):
 
         loading_layer_task_group = loading_layer(**kwargs)
 
-        # clean_layer_task_group = clean_layer(**kwargs)
+        clean_layer_task_group = clean_layer(**kwargs)
 
         # edw_layer_task_group = edw_layer(**kwargs)
 
-        check_gcs_file >> loading_layer_task_group # >> clean_layer_task_group >> edw_layer_task_group 
+        check_gcs_file >> loading_layer_task_group >> clean_layer_task_group # >> edw_layer_task_group 
 
     get_dag()
 
@@ -76,7 +76,9 @@ config = {
 
     'bucket_name': _bucket_name,
     'table_name': _table_name,
-    'prefix_name': f'raw/{_table_name}'
+    'prefix_name': f'raw/{_table_name}',
+
+    'developer_email': ['waooooo909@gmail.com']
 }
 
 globals()[_dag_id] = create_dag(_dag_id, _schedule, **config)

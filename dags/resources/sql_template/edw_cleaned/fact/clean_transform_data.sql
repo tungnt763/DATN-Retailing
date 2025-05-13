@@ -1,4 +1,4 @@
-CREATE IF NOT EXISTS TABLE `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}_temp` AS
+CREATE TABLE IF NOT EXISTS `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}_temp` AS
 
 -- Cast data from input table
 WITH casted_table AS (
@@ -22,7 +22,7 @@ WITH casted_table AS (
     -- SAFE_CAST(INITCAP(TRIM(trn_type)) AS STRING) AS trn_type,
     -- SAFE_CAST(INITCAP(TRIM(trn_pymnt_mthd)) AS STRING) AS trn_pymnt_mthd,
     -- SAFE_CAST(TRIM(trn_invc_ttl) AS NUMERIC) AS trn_invc_ttl,
-    {{ params.columns_cast_expr }},
+    {{ params.cast_exprs }},
     loaded_batch,
     loaded_part,
     batch_load_ts,
@@ -154,7 +154,7 @@ validated_table AS (
     -- trn_type,
     -- trn_pymnt_mthd,
     -- trn_invc_ttl,
-    {{ params.columns }},
+    {{ params.col_names }},
     loaded_batch,
     loaded_part,
     batch_load_ts,

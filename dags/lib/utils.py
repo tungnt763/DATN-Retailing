@@ -131,6 +131,7 @@ def get_unix_timestamp_from_filename(filename: str) -> int:
 
 # >>>>> Cleaned layer <<<<<
 
+# >>>>>   Dim table   <<<<<
 def get_clean_expressions_for_table(table_name, metadata_file_name, input_dataset, output_dataset, project_name):
     metadata = read_metadata(metadata_file_name)
 
@@ -210,6 +211,45 @@ def get_clean_expressions_for_table(table_name, metadata_file_name, input_datase
         "selected_columns": ',\n    '.join(selected_columns),
         "pk_expr": ', '.join(pk_expr),
     }
+
+# >>>>>   Fact table  <<<<<
+def get_clean_expressions_for_fact_table(table_name, metadata_file_name, input_dataset, output_dataset, project_name):
+    metadata = read_metadata(metadata_file_name)
+
+    columns = metadata[table_name]["columns"]
+    cast_exprs = []
+    col_names = []
+    pk_expr = []
+    for col in columns:
+        col_name = col["physical_name"]
+        col_type = col["type"]
+        col_format = col.get("format", "").lower()
+        expr = f"TRIM({col_name})"
+
+        if col.get("pk") == "Y":
+            pk_expr.append(col_name)
+
+        # Apply format transformations
+        if col_format == "upper":
+            expr = f"UPPER({expr})"
+        elif col_format == "initcap":
+            expr = f"INITCAP({expr})"
+
+        # Apply SAFE_CAST
+        expr = f"SAFE_CAST({expr} AS {col_type})"
+        cast_exprs.append(f"{expr} AS {col_name}")
+        col_names.append(col_name)
+
+    return {
+        "project_name": project_name,
+        "input_dataset": input_dataset,
+        "output_dataset": output_dataset,
+        "table_name": table_name,
+        "cast_exprs": ',\n    '.join(cast_exprs),
+        "col_names": ',\n    '.join(col_names),
+        "pk_expr": ', '.join(pk_expr),
+    }
+    
 
 # >>>>>   EDW layer   <<<<<
 def get_edw_expressions_for_table(table_name, metadata_file_name, input_dataset, output_dataset, project_name):
