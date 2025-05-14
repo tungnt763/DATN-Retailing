@@ -855,7 +855,7 @@
     "table_type": "dimension",
     "scd_type": "scd2",
     "logical_name_en": "Dim Currency",
-    "col_nums": "7",
+    "col_nums": "6",
     "columns": [
       {
         "logical_name_en": "Currency Surrogate Key",
@@ -918,22 +918,10 @@
         "default_value": "1.0"
       },
       {
-        "logical_name_en": "Rate Date",
-        "physical_name": "crncy_rt_dt",
-        "type": "DATE",
-        "index": "6",
-        "pk": "N",
-        "nk": "N",
-        "mode": "REQUIRED",
-        "method": "",
-        "other": "",
-        "default_value": "1900-01-01"
-      },
-      {
         "logical_name_en": "Base Currency",
         "physical_name": "crncy_base",
         "type": "STRING",
-        "index": "7",
+        "index": "6",
         "pk": "N",
         "nk": "N",
         "mode": "REQUIRED",

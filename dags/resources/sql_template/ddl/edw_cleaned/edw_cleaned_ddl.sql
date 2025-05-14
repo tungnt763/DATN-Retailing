@@ -115,7 +115,6 @@ CREATE TABLE IF NOT EXISTS `datn-retailing.edw_cleaned.currency` (
     crncy_name                STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Currency Name\", \"clmn_desc\": \"Currency Name of the currency table\"}"),
     crncy_sbl                 STRING  OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Currency Symbol\", \"clmn_desc\": \"Currency Symbol of the currency table\"}"),
     crncy_rt_usd              NUMERIC NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Rate to USD\", \"clmn_desc\": \"Rate to USD of the currency table\"}"),
-    crncy_rt_dt               DATE NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Rate Date\", \"clmn_desc\": \"Rate Date of the currency table\"}"),
     crncy_base                STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Base Currency\", \"clmn_desc\": \"Base Currency of the currency table\"}"),
     loaded_batch              STRING OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Loaded Batch\", \"clmn_desc\": \"Unix timestamp of the loaded batch\"}"),
     loaded_part               DATE OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Loaded Part\", \"clmn_desc\": \"Partition date of the batch load\"}"),

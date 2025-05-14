@@ -917,7 +917,7 @@
   "currency": {
     "physical_name": "currency",
     "logical_name_en": "Currency",
-    "col_nums": "6",
+    "col_nums": "5",
     "columns": [
       {
         "logical_name_en": "Currency Code",
@@ -980,25 +980,10 @@
         "default_value": "1.0"
       },
       {
-        "logical_name_en": "Rate Date",
-        "physical_name": "crncy_rt_dt",
-        "type": "DATE",
-        "index": "5",
-        "pk": "N",
-        "mode": "REQUIRED",
-        "format": "date inverse",
-        "min": "",
-        "max": "",
-        "values": [],
-        "regax": "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$",
-        "other": "",
-        "default_value": "1900-01-01"
-      },
-      {
         "logical_name_en": "Base Currency",
         "physical_name": "crncy_base",
         "type": "STRING",
-        "index": "6",
+        "index": "5",
         "pk": "N",
         "mode": "REQUIRED",
         "format": "upper",

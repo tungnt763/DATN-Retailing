@@ -14,7 +14,7 @@ default_args = {
 @dag(
     dag_id='fetch_currency_latest',
     default_args=default_args,
-    schedule_interval='0 * * * *',
+    schedule_interval='0 0 * * *',
     start_date=datetime(2023, 1, 1),
     catchup=False,
     tags=['fetch', 'currency'],

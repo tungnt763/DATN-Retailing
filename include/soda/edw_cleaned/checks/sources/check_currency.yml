@@ -4,14 +4,12 @@ checks for currency:
       when required column missing:
       - crncy_cd
       - crncy_rt_usd
-      - crncy_rt_dt
       - crncy_base
       when wrong column type:
         crncy_cd: string
         crncy_name: string
         crncy_sbl: string
         crncy_rt_usd: numeric
-        crncy_rt_dt: date
         crncy_base: string
 - row_count > 0:
     name: currency should contain data
@@ -24,8 +22,6 @@ checks for currency:
     valid regex: ^[A-Z]{3}$
 - missing_count(crncy_rt_usd) = 0:
     name: Rate to USD must not be null
-- missing_count(crncy_rt_dt) = 0:
-    name: Rate Date must not be null
 - missing_count(crncy_base) = 0:
     name: Base Currency must not be null
 - invalid_count(crncy_base) = 0:

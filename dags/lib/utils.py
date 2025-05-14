@@ -268,11 +268,11 @@ def get_edw_expressions_for_table(table_name, metadata_file_name, input_dataset,
     old_columns_except_method = ",\n    ".join([col["physical_name"] for col in columns if col["pk"] != "Y"])
 
     natural_keys = [col["physical_name"] for col in columns if col["nk"] == "Y"]
-    natural_key_expr = "\n        AND ".join([f"target.{nk} = source.{nk}" for nk in natural_keys])
+    natural_key_expr = "\n    AND ".join([f"target.{nk} = source.{nk}" for nk in natural_keys])
 
     columns_except_natural_key_expr = ",\n        ".join([f"{col['physical_name']} = source.{col['physical_name']}" for col in columns if col["pk"] != "Y" and col["nk"] != "Y"])
 
-    columns_except_natural_key_diff_expr = "\n        OR ".join([f"target.{col['physical_name']} != source.{col['physical_name']}" for col in columns if col["pk"] != "Y" and col["nk"] != "Y"])
+    columns_except_natural_key_equal_expr = "\n    AND ".join([f"target.{col['physical_name']} = source.{col['physical_name']}" for col in columns if col["pk"] != "Y" and col["nk"] != "Y"])
 
     new_columns = ", ".join([col["physical_name"] for col in columns])
 
@@ -286,7 +286,7 @@ def get_edw_expressions_for_table(table_name, metadata_file_name, input_dataset,
         "old_columns_in_row": old_columns_in_row,
         "old_columns_except_method": old_columns_except_method,
         "natural_key_expr": natural_key_expr,
-        "columns_except_natural_key_diff_expr": columns_except_natural_key_diff_expr,
+        "columns_except_natural_key_equal_expr": columns_except_natural_key_equal_expr,
         "columns_except_natural_key_expr": columns_except_natural_key_expr,
         "new_columns": new_columns,
         "scd_type": table_info["scd_type"],

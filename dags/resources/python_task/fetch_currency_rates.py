@@ -28,7 +28,6 @@ def fetch_currency_rates(output_path: str):
         response = requests.get(API_URL)
         response.raise_for_status()
         data = response.json()
-        rate_date = datetime.utcfromtimestamp(data["timestamp"]).strftime("%Y-%m-%d")
 
         # Create DataFrame from rates
         rates_df = pd.DataFrame(data["rates"].items(), columns=["currency_code", "rate_from_base"])
@@ -41,13 +40,11 @@ def fetch_currency_rates(output_path: str):
         # Merge with metadata
         merged_df = pd.merge(rates_df, metadata_df, on="currency_code", how="left")
 
-        # Add extra fields
-        merged_df["rate_date"] = rate_date
         merged_df["base_currency"] = BASE_CURRENCY
 
         # Final columns for BigQuery
         final_df = merged_df[[
-            "currency_code", "name", "symbol", "rate_to_usd", "rate_date", "base_currency"
+            "currency_code", "name", "symbol", "rate_to_usd", "base_currency"
         ]].rename(columns={
             "name": "currency_name",
             "symbol": "currency_symbol"
