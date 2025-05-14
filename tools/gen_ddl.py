@@ -67,6 +67,8 @@ for layer, metadata in zip(LAYER, METADATA):
             if meta_col in ["effective_start_date", "effective_end_date", "flag_active"]:
                 if layer == 'edw_cleaned':
                     continue
+                elif table_info["table_type"] == "fact":
+                    continue
                 elif table_info["scd_type"] == "scd1":
                     continue
             

@@ -250,8 +250,9 @@ def get_clean_expressions_for_fact_table(table_name, metadata_file_name, input_d
         "pk_expr": ', '.join(pk_expr),
     }
     
-
 # >>>>>   EDW layer   <<<<<
+
+# >>>>>   Dim table   <<<<<
 def get_edw_expressions_for_table(table_name, metadata_file_name, input_dataset, output_dataset, project_name):
     import json
     from pathlib import Path
@@ -292,3 +293,44 @@ def get_edw_expressions_for_table(table_name, metadata_file_name, input_dataset,
     }
 
     return params
+
+# >>>>>   Fact table  <<<<<
+def get_edw_expressions_for_fact_table(table_name, metadata_file_name, input_dataset, output_dataset, project_name):
+    metadata = read_metadata(metadata_file_name)
+
+    table_info = metadata[table_name]
+    columns = table_info["columns"]
+    col_names = [col["physical_name"] for col in columns]
+    
+    # method expressions (SELECT col AS alias)
+    method_exprs = [
+        f"{col.get('method')} AS {col['physical_name']}" if col.get('method') else col['physical_name']
+        for col in columns
+    ]
+    
+    # schema columns with type (CREATE TABLE ...)
+    schema_columns = [
+        f"{col['physical_name']} {col['type']}" for col in columns
+    ]
+
+    # array_agg expressions (for merge/select latest)
+    array_agg_exprs = [
+        f"ARRAY_AGG({col['physical_name']} ORDER BY trn_dt_key DESC, trn_hr DESC, flg_if DESC)[ORDINAL(1)] AS {col['physical_name']}"
+        for col in columns if col.get('pk') != "Y"
+    ]
+
+    # primary keys
+    pk_expr = [col["physical_name"] for col in columns if col.get("pk") == "Y"]
+
+    return {
+        "project_name": project_name,
+        "input_dataset": input_dataset,
+        "input_table": table_name,
+        "output_dataset": output_dataset,
+        "output_table": table_info["physical_name"],
+        "col_names": ',\n    '.join(col_names),
+        "method_exprs": ',\n    '.join(method_exprs),
+        "schema_columns": ',\n    '.join(schema_columns),
+        "array_agg_exprs": ',\n    '.join(array_agg_exprs),
+        "pk_expr": ',\n    '.join(pk_expr),
+    }

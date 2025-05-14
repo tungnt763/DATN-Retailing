@@ -5,6 +5,7 @@ checks for dim_products:
       - prd_surr_key
       - prd_id
       - prd_ctgry
+      - prd_sub_ctgry
       - prd_cost
       when wrong column type:
         prd_surr_key: string
@@ -30,5 +31,7 @@ checks for dim_products:
     name: Product ID must not be null
 - missing_count(prd_ctgry) = 0:
     name: Category must not be null
+- missing_count(prd_sub_ctgry) = 0:
+    name: Sub Category must not be null
 - missing_count(prd_cost) = 0:
     name: Production Cost must not be null

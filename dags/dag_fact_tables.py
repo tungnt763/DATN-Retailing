@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from airflow.providers.google.cloud.sensors.gcs import GCSObjectsWithPrefixExistenceSensor
 from resources.business.task_group_loading_layer import loading_layer
 from resources.business.fact.task_group_cleaned_layer import clean_layer
-# from resources.business.task_group_edw_layer import edw_layer
+from resources.business.fact.task_group_edw_layer import edw_layer
 from lib.utils import load_db_env
 
 HOME = os.getenv('AIRFLOW_HOME')
@@ -54,9 +54,9 @@ def create_dag(_dag_id, _schedule, **kwargs):
 
         clean_layer_task_group = clean_layer(**kwargs)
 
-        # edw_layer_task_group = edw_layer(**kwargs)
+        edw_layer_task_group = edw_layer(**kwargs)
 
-        check_gcs_file >> loading_layer_task_group >> clean_layer_task_group # >> edw_layer_task_group 
+        check_gcs_file >> loading_layer_task_group >> clean_layer_task_group >> edw_layer_task_group 
 
     get_dag()
 

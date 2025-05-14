@@ -1,6 +1,6 @@
 INSERT INTO `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.output_table }}_temp`
 SELECT
-    {{ params.columns }},
+    {{ params.col_names }},
     create_date,
     create_task_id,
     create_task_run_id,

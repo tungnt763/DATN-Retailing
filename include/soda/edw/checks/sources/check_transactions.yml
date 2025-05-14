@@ -10,36 +10,40 @@ checks for fact_transactions:
       - trn_str_key
       - trn_emply_key
       - trn_dscnt_key
+      - trn_crncy_key
       - trn_sale_qty
       - trn_reg_unit_prc
       - trn_dscnt_unit_prc
       - trn_net_unit_prc
       - trn_ext_sale_dol
       - trn_ext_dscnt_dol
+      - trn_ext_cost_dol
+      - trn_ext_grs_prft_dol
       - trn_line_ttl
+      - trn_type
       when wrong column type:
         trn_id: string
-        trn_hr: int64
+        trn_hr: string
         trn_dt_key: string
         trn_cstmr_key: string
         trn_prd_key: string
         trn_str_key: string
         trn_emply_key: string
         trn_dscnt_key: string
+        trn_crncy_key: string
         trn_sale_qty: int64
         trn_reg_unit_prc: numeric
         trn_dscnt_unit_prc: numeric
         trn_net_unit_prc: numeric
         trn_ext_sale_dol: numeric
         trn_ext_dscnt_dol: numeric
+        trn_ext_cost_dol: numeric
+        trn_ext_grs_prft_dol: numeric
         trn_line_ttl: numeric
         trn_sz: string
         trn_cl: string
-        trn_crncy: string
-        trn_crncy_sbl: string
         trn_type: string
         trn_pymnt_mthd: string
-        trn_sku: string
 - row_count > 0:
     name: fact_transactions should contain data
 - duplicate_count(trn_id) = 0:
@@ -60,6 +64,8 @@ checks for fact_transactions:
     name: Employee Key must not be null
 - missing_count(trn_dscnt_key) = 0:
     name: Discount Key must not be null
+- missing_count(trn_crncy_key) = 0:
+    name: Currency Key must not be null
 - missing_count(trn_sale_qty) = 0:
     name: Sale Quantity must not be null
 - missing_count(trn_reg_unit_prc) = 0:
@@ -72,5 +78,11 @@ checks for fact_transactions:
     name: Extended Sales Dollar Amount must not be null
 - missing_count(trn_ext_dscnt_dol) = 0:
     name: Extended Discount Dollar Amount must not be null
+- missing_count(trn_ext_cost_dol) = 0:
+    name: Extended Cost Dollar Amount must not be null
+- missing_count(trn_ext_grs_prft_dol) = 0:
+    name: Extended Gross Profit Dollar Amount must not be null
 - missing_count(trn_line_ttl) = 0:
     name: Line Total must not be null
+- missing_count(trn_type) = 0:
+    name: Transaction Type must not be null

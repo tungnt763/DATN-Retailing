@@ -1,4 +1,4 @@
-CREATE IF NOT EXISTS TABLE `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.output_table }}_temp` (
+CREATE TABLE IF NOT EXISTS `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.output_table }}_temp` (
     {{ params.schema_columns }},
     create_date TIMESTAMP,
     create_task_id STRING,
