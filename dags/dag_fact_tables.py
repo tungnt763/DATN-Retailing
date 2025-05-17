@@ -6,6 +6,7 @@ from resources.business.task_group_loading_layer import loading_layer
 from resources.business.fact.task_group_cleaned_layer import clean_layer
 from resources.business.fact.task_group_edw_layer import edw_layer
 from lib.utils import load_db_env
+from resources.python_task.archive_files_task import archive_gcs_files
 
 HOME = os.getenv('AIRFLOW_HOME')
 
@@ -56,7 +57,9 @@ def create_dag(_dag_id, _schedule, **kwargs):
 
         edw_layer_task_group = edw_layer(**kwargs)
 
-        check_gcs_file >> loading_layer_task_group >> clean_layer_task_group >> edw_layer_task_group 
+        archive_gcs_files_task = archive_gcs_files.override(task_id=f'archive_gcs_{kwargs.get("table_name")}_files')(kwargs.get('bucket_name'), kwargs.get('table_name'), kwargs.get('gcp_conn_id'))
+
+        check_gcs_file >> loading_layer_task_group >> clean_layer_task_group >> edw_layer_task_group >> archive_gcs_files_task
 
     get_dag()
 

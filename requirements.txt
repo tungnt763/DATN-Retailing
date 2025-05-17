@@ -1,2 +1,5 @@
 apache-airflow-providers-google==10.3.0
 soda-core-bigquery==3.0.45
+acryl-datahub-airflow-plugin[plugin-v2]
+apache-airflow-providers-openlineage
+datahub[airflow]
