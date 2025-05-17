@@ -13,3 +13,6 @@ include/dataset/
 include/soda/edw_loaded/configuration.yml
 include/soda/edw_cleaned/configuration.yml
 include/soda/edw/configuration.yml
+
+superset/
+
