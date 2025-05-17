@@ -14,7 +14,7 @@ SELECT
     GENERATE_UUID() AS surr_key,
     {{ params.old_columns }},
     effective_start_date_default AS effective_start_date,
-    TIMESTAMP('9999-12-31 23:59:59') AS effective_end_date,
+    TIMESTAMP('2261-12-31 23:59:59') AS effective_end_date,
     '1' AS flag_active,
     create_date,
     create_task_id,
