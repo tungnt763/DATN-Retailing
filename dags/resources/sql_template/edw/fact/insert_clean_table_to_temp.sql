@@ -34,6 +34,10 @@ JOIN `datn-retailing.edw.dim_discounts` AS d
     AND ((p.prd_ctgry = d.dscnt_ctgry AND p.prd_sub_ctgry = d.dscnt_sub_ctgry) OR d.dscnt_ctgry = 'Unknown')
     AND d.effective_start_date <= t.trn_date
     AND d.effective_end_date >= t.trn_date
+JOIN `datn-retailing.edw.dim_weather` AS w
+    ON DATE(t.trn_date) = w.wthr_date
+    AND s.str_lat = w.wthr_lat
+    AND s.str_lon = w.wthr_lon
 WHERE
     t.create_date > TIMESTAMP('{{ task_instance.xcom_pull(task_ids="clean_layer.get_max_timestamp", key="max_timestamp") }}')
 ;

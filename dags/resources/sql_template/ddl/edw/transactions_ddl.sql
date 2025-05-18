@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS `datn-retailing.edw.fact_transactions` (
     trn_id                    STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Transaction ID\", \"clmn_desc\": \"Transaction ID of the fact_transactions table\"}"),
     trn_hr                    STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Transaction Hour\", \"clmn_desc\": \"Transaction Hour of the fact_transactions table\"}"),
     trn_dt_key                STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Date Key\", \"clmn_desc\": \"Date Key of the fact_transactions table\"}"),
+    trn_wthr_key              STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Weather Key\", \"clmn_desc\": \"Weather Key of the fact_transactions table\"}"),
     trn_cstmr_key             STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Customer Key\", \"clmn_desc\": \"Customer Key of the fact_transactions table\"}"),
     trn_prd_key               STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Product Key\", \"clmn_desc\": \"Product Key of the fact_transactions table\"}"),
     trn_str_key               STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Store Key\", \"clmn_desc\": \"Store Key of the fact_transactions table\"}"),

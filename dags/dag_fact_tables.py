@@ -52,16 +52,16 @@ def create_dag(_dag_id, _schedule, **kwargs):
             mode='reschedule',
         )
 
+        trigger_fetch_weather_dag = TriggerDagRunOperator(
+            task_id="trigger_fetch_weather_dag",
+            trigger_dag_id="fetch_weather_data",
+            wait_for_completion=True
+        )
+
         trigger_weather_dag = TriggerDagRunOperator(
             task_id="trigger_weather_dag",
-            trigger_dag_id="dag_fetch_weather_data",
-            conf={
-                "gcp_conn_id": kwargs.get('gcp_conn_id'),
-                "bucket_name": kwargs.get('bucket_name'),
-                "project_name": kwargs.get('project'),
-                "dataset_name": kwargs.get('clean_dataset')
-            },
-            wait_for_completion=False
+            trigger_dag_id="dag_weather",
+            wait_for_completion=True
         )
 
         loading_layer_task_group = loading_layer(**kwargs)
@@ -72,7 +72,7 @@ def create_dag(_dag_id, _schedule, **kwargs):
 
         archive_gcs_files_task = archive_gcs_files.override(task_id=f'archive_gcs_{kwargs.get("table_name")}_files')(kwargs.get('bucket_name'), kwargs.get('table_name'), kwargs.get('gcp_conn_id'))
 
-        check_gcs_file >> loading_layer_task_group >> clean_layer_task_group >> edw_layer_task_group >> archive_gcs_files_task
+        check_gcs_file >> loading_layer_task_group >> clean_layer_task_group >> trigger_fetch_weather_dag >> trigger_weather_dag >> edw_layer_task_group >> archive_gcs_files_task
 
     get_dag()
 
