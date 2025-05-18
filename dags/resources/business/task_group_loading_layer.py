@@ -42,6 +42,15 @@ def loading_layer(**kwargs):
 
     source_objects_list = list_all_file_name_gcs(_table_name, _gcp_conn_id, _bucket_name, _prefix_name)
 
+    file = ''
+    loaded_batch = 0
+
+    if source_objects_list:
+        for file_check in source_objects_list:
+            if get_unix_timestamp_from_filename(file_check) > loaded_batch:
+                file = file_check
+                loaded_batch = get_unix_timestamp_from_filename(file_check)
+
     create_load_dataset = BigQueryCreateEmptyDatasetOperator(
             task_id='create_load_dataset',
             gcp_conn_id=_gcp_conn_id,
@@ -63,45 +72,35 @@ def loading_layer(**kwargs):
         params=params,
         location='US', 
     )
-    
 
-    if source_objects_list:
-        load_data_to_staging = GCSToBigQueryOperator.partial(
-            task_id=f'load_{_table_name}_gcs_to_staging',
-            gcp_conn_id=_gcp_conn_id,
-            bucket=_bucket_name,
-            destination_project_dataset_table=f"{_project_name}.{_dataset_name}.{_table_name}_staging",
-            schema_fields=_schema_fields_list,
-            write_disposition='WRITE_TRUNCATE',
-        ).expand(
-            source_objects=[[file] for file in source_objects_list]
-        )
+    load_data_to_staging = GCSToBigQueryOperator(
+        task_id=f"load_{_table_name}_gcs_to_staging",
+        gcp_conn_id=_gcp_conn_id,
+        bucket=_bucket_name,
+        source_objects=[file],
+        destination_project_dataset_table=f"{_project_name}.{_dataset_name}.{_table_name}_staging",
+        schema_fields=_schema_fields_list,
+        write_disposition="WRITE_TRUNCATE",
+    )
 
-        load_staging_to_temp = BigQueryInsertJobOperator.partial(
-            task_id=f"load_{_table_name}_staging_to_temp",
-            gcp_conn_id=_gcp_conn_id,
-            configuration={
-                "query": {
-                    "query": "{% include '" + _sql_template_staging + "' %}",
-                    "useLegacySql": False,
-                }
-            },
-            location='US', 
-        ).expand_kwargs([
-            {
-                "params": {
-                    "project_name": _project_name,
-                    "dataset_name": _dataset_name,
-                    "table_name": _table_name,
-                    "columns": _columns,
-                    "loaded_batch": str(get_unix_timestamp_from_filename(file))
-                }
+    load_staging_to_temp = BigQueryInsertJobOperator(
+        task_id=f"load_{_table_name}_staging_to_temp",
+        gcp_conn_id=_gcp_conn_id,
+        configuration={
+            "query": {
+                "query": "{% include '" + _sql_template_staging + "' %}",
+                "useLegacySql": False,
             }
-            for file in source_objects_list
-        ])
-    else:
-        load_data_to_staging = EmptyOperator(task_id=f"skip_load_{_table_name}_gcs_to_staging")
-        load_staging_to_temp = EmptyOperator(task_id=f"skip_load_{_table_name}_staging_to_temp")
+        },
+        location="US",
+        params={
+            "project_name": _project_name,
+            "dataset_name": _dataset_name,
+            "table_name": _table_name,
+            "columns": _columns,
+            "loaded_batch": loaded_batch
+        }
+    )
 
     load_temp_to_table = BigQueryInsertJobOperator(
         task_id=f'load_temp_to_{_table_name}',
@@ -136,7 +135,3 @@ def loading_layer(**kwargs):
     insert_job = insert_job_task.override(task_id=f'insert_loaded_{_table_name}_job_to_log')(gcp_conn_id=_gcp_conn_id, dataset_name=_dataset_name, table_name=_table_name)
 
     max_timestamp >> create_load_dataset >> create_temp_table >> load_data_to_staging >> load_staging_to_temp >> dqc >> load_temp_to_table >> drop_staging_temp_table >> insert_job
-
-    # create_load_dataset >> load_data_to_bigquery >> dqc
-    
-    # dqc >> load_temp_to_table >> insert_job
