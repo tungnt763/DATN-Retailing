@@ -120,6 +120,28 @@ def generate_checks(table_name, table_info):
                 }
             })
 
+        # Min and max
+        if DATASET != "edw":
+            min_val = col.get("min")
+            max_val = col.get("max")
+            col_type = col.get("type", "").upper()
+
+            is_numeric_or_date = any(x in col_type for x in ["INT", "FLOAT", "NUMERIC", "DATE", "TIME"])
+
+            if is_numeric_or_date:
+                if min_val != "":
+                    checks[f"checks for {table_name}{TABLE_NAME_SUFFIX}"].append({
+                        f"min({name}) >= {min_val}": {
+                            "name": f"{logic_name} must be >= {min_val}"
+                        }
+                    })
+                if max_val != "":
+                    checks[f"checks for {table_name}{TABLE_NAME_SUFFIX}"].append({
+                        f"max({name}) <= {max_val}": {
+                            "name": f"{logic_name} must be <= {max_val}"
+                        }
+                    })
+
         # Custom fail SQL
         if col.get("other"):
             for line in col["other"].splitlines():

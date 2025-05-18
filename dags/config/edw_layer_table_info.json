@@ -930,5 +930,146 @@
         "default_value": "USD"
       }
     ]
+  },
+  "weather": {
+    "physical_name": "dim_weather",
+    "table_type": "dimension",
+    "scd_type": "scd1",
+    "logical_name_en": "Dim Weather",
+    "col_nums": "11",
+    "columns": [
+      {
+        "logical_name_en": "Weather Surrogate Key",
+        "physical_name": "wthr_surr_key",
+        "type": "STRING",
+        "index": "1",
+        "pk": "Y",
+        "nk": "N",
+        "mode": "REQUIRED",
+        "method": "",
+        "other": "",
+        "default_value": ""
+      },
+      {
+        "logical_name_en": "Weather Date",
+        "physical_name": "wthr_date",
+        "type": "DATE",
+        "index": "2",
+        "pk": "N",
+        "nk": "Y",
+        "mode": "REQUIRED",
+        "method": "",
+        "other": "",
+        "default_value": ""
+      },
+      {
+        "logical_name_en": "City",
+        "physical_name": "wthr_city",
+        "type": "STRING",
+        "index": "3",
+        "pk": "N",
+        "nk": "N",
+        "mode": "NULLABLE",
+        "method": "",
+        "other": "",
+        "default_value": "Unknown"
+      },
+      {
+        "logical_name_en": "Country",
+        "physical_name": "wthr_cntry",
+        "type": "STRING",
+        "index": "4",
+        "pk": "N",
+        "nk": "N",
+        "mode": "NULLABLE",
+        "method": "",
+        "other": "",
+        "default_value": "Unknown"
+      },
+      {
+        "logical_name_en": "Latitude",
+        "physical_name": "wthr_lat",
+        "type": "NUMERIC",
+        "index": "5",
+        "pk": "N",
+        "nk": "Y",
+        "mode": "REQUIRED",
+        "method": "",
+        "other": "",
+        "default_value": ""
+      },
+      {
+        "logical_name_en": "Longitude",
+        "physical_name": "wthr_lon",
+        "type": "NUMERIC",
+        "index": "6",
+        "pk": "N",
+        "nk": "Y",
+        "mode": "REQUIRED",
+        "method": "",
+        "other": "",
+        "default_value": ""
+      },
+      {
+        "logical_name_en": "Temperature Average",
+        "physical_name": "wthr_tmp_avg",
+        "type": "NUMERIC",
+        "index": "7",
+        "pk": "N",
+        "nk": "N",
+        "mode": "NULLABLE",
+        "method": "",
+        "other": "",
+        "default_value": ""
+      },
+      {
+        "logical_name_en": "Precipitation",
+        "physical_name": "wthr_prcp",
+        "type": "NUMERIC",
+        "index": "8",
+        "pk": "N",
+        "nk": "N",
+        "mode": "NULLABLE",
+        "method": "",
+        "other": "",
+        "default_value": ""
+      },
+      {
+        "logical_name_en": "Rain",
+        "physical_name": "wthr_rain",
+        "type": "NUMERIC",
+        "index": "9",
+        "pk": "N",
+        "nk": "N",
+        "mode": "NULLABLE",
+        "method": "",
+        "other": "",
+        "default_value": ""
+      },
+      {
+        "logical_name_en": "Showers",
+        "physical_name": "wthr_shwrs",
+        "type": "NUMERIC",
+        "index": "10",
+        "pk": "N",
+        "nk": "N",
+        "mode": "NULLABLE",
+        "method": "",
+        "other": "",
+        "default_value": ""
+      },
+      {
+        "logical_name_en": "Snowfall",
+        "physical_name": "wthr_snwf",
+        "type": "NUMERIC",
+        "index": "11",
+        "pk": "N",
+        "nk": "N",
+        "mode": "NULLABLE",
+        "method": "",
+        "other": "",
+        "default_value": ""
+      }
+    ]
   }
 }

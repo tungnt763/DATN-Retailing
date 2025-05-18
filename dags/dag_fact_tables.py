@@ -2,6 +2,7 @@ import os
 from airflow.decorators import dag, task, task_group
 from datetime import datetime, timedelta, timezone
 from airflow.providers.google.cloud.sensors.gcs import GCSObjectsWithPrefixExistenceSensor
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from resources.business.task_group_loading_layer import loading_layer
 from resources.business.fact.task_group_cleaned_layer import clean_layer
 from resources.business.fact.task_group_edw_layer import edw_layer
@@ -11,7 +12,7 @@ from resources.python_task.archive_files_task import archive_gcs_files
 HOME = os.getenv('AIRFLOW_HOME')
 
 db_env = load_db_env()
-_gcp_conn_id = 'gcp'
+_gcp_conn_id = db_env.get('gcp_conn_id')
 _project = db_env.get('project')
 _load_dataset = db_env.get('load_dataset')
 _clean_dataset = db_env.get('clean_dataset')
@@ -49,6 +50,18 @@ def create_dag(_dag_id, _schedule, **kwargs):
             poke_interval=60,
             soft_fail=True,
             mode='reschedule',
+        )
+
+        trigger_weather_dag = TriggerDagRunOperator(
+            task_id="trigger_weather_dag",
+            trigger_dag_id="dag_fetch_weather_data",
+            conf={
+                "gcp_conn_id": kwargs.get('gcp_conn_id'),
+                "bucket_name": kwargs.get('bucket_name'),
+                "project_name": kwargs.get('project'),
+                "dataset_name": kwargs.get('clean_dataset')
+            },
+            wait_for_completion=False
         )
 
         loading_layer_task_group = loading_layer(**kwargs)

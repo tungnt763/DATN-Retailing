@@ -11,7 +11,7 @@ from lib.utils import load_db_env, get_table_names
 HOME = os.getenv('AIRFLOW_HOME')
 
 db_env = load_db_env()
-_gcp_conn_id = 'gcp'
+_gcp_conn_id = db_env.get('gcp_conn_id')
 _project = db_env.get('project')
 _load_dataset = db_env.get('load_dataset')
 _clean_dataset = db_env.get('clean_dataset')
@@ -70,7 +70,7 @@ for _table_name in _table_names:
         continue
 
     _dag_id = f'dag_{_table_name}'
-    _schedule = '0 1 * * *'
+    _schedule = '0 1 * * *' if _table_name != 'weather' else None
 
     config = {
         'dag_id': _dag_id,

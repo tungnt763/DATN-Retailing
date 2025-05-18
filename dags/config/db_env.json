@@ -3,5 +3,6 @@
     "load_dataset": "edw_loaded",
     "clean_dataset": "edw_cleaned",
     "dwh_dataset": "edw",
-    "bucket_name": "retailing_data"
+    "bucket_name": "retailing_data",
+    "gcp_conn_id": "gcp"
 }

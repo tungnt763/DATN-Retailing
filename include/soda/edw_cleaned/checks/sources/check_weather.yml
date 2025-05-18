@@ -1,0 +1,32 @@
+checks for weather:
+- schema:
+    fail:
+      when required column missing:
+      - wthr_date
+      - wthr_lat
+      - wthr_lon
+      when wrong column type:
+        wthr_date: date
+        wthr_city: string
+        wthr_cntry: string
+        wthr_lat: numeric
+        wthr_lon: numeric
+        wthr_tmp_avg: numeric
+        wthr_prcp: numeric
+        wthr_rain: numeric
+        wthr_shwrs: numeric
+        wthr_snwf: numeric
+- row_count > 0:
+    name: weather should contain data
+- duplicate_count(wthr_date, wthr_lat, wthr_lon) = 0:
+    name: (wthr_date, wthr_lat, wthr_lon) must be unique
+- missing_count(wthr_date) = 0:
+    name: Weather Date must not be null
+- missing_count(wthr_lat) = 0:
+    name: Latitude must not be null
+- missing_count(wthr_lon) = 0:
+    name: Longitude must not be null
+- min(wthr_tmp_avg) >= -100.0:
+    name: Temperature Average must be >= -100.0
+- max(wthr_tmp_avg) <= 100.0:
+    name: Temperature Average must be <= 100.0
