@@ -69,6 +69,7 @@ def fetch_and_upload_weather_to_gcs(gcp_conn_id, project_name, dataset_name, buc
 
     # Step 2️⃣: Fetch từ Open-Meteo API
     for _, row in rows.iterrows():
+        print(f"Fetching weather data for {row.weather_date}, {row.city}, {row.country}")
         rec = fetch_weather(row.latitude, row.longitude, row.weather_date, row.city, row.country)
         if rec:
             weather_records.append(rec)

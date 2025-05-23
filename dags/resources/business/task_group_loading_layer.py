@@ -1,5 +1,5 @@
 from airflow.decorators import task, task_group
-from lib.utils import get_schema_field_load_layer, list_all_file_name_gcs, get_schema_load_table, get_unix_timestamp_from_filename
+from lib.utils import get_schema_field_load_layer, list_all_file_name_gcs, get_schema_load_table, get_file_and_loaded_batch
 from resources.python_task.data_quality_check import data_quality_check
 from resources.python_task.get_max_timestamp_task import get_max_timestamp_task
 from resources.python_task.insert_job_task import insert_job_task
@@ -42,14 +42,7 @@ def loading_layer(**kwargs):
 
     source_objects_list = list_all_file_name_gcs(_table_name, _gcp_conn_id, _bucket_name, _prefix_name)
 
-    file = ''
-    loaded_batch = 0
-
-    if source_objects_list:
-        for file_check in source_objects_list:
-            if get_unix_timestamp_from_filename(file_check) > loaded_batch:
-                file = file_check
-                loaded_batch = get_unix_timestamp_from_filename(file_check)
+    file, loaded_batch = get_file_and_loaded_batch(_table_name, _gcp_conn_id, _bucket_name, _prefix_name)
 
     create_load_dataset = BigQueryCreateEmptyDatasetOperator(
             task_id='create_load_dataset',

@@ -59,7 +59,7 @@ def create_dag(_dag_id, _schedule, **kwargs):
 
         edw_layer_task_group = edw_layer(**kwargs)
 
-        archive_gcs_files_task = archive_gcs_files.override(task_id=f'archive_gcs_{kwargs.get("table_name")}_files')(kwargs.get('bucket_name'), kwargs.get('table_name'), kwargs.get('gcp_conn_id'))
+        archive_gcs_files_task = archive_gcs_files.override(task_id=f'archive_gcs_{kwargs.get("table_name")}_files')(kwargs.get('bucket_name'), kwargs.get('table_name'), kwargs.get('gcp_conn_id'), kwargs.get('prefix_name'))
 
         check_gcs_file >> loading_layer_task_group >> clean_layer_task_group >> edw_layer_task_group >> archive_gcs_files_task
 

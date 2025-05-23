@@ -75,6 +75,20 @@ def list_all_file_name_gcs(table_name, gcp_conn_id, bucket_name, prefix_name):
         return blobs 
     return None
 
+def get_file_and_loaded_batch(table_name, gcp_conn_id, bucket_name, prefix_name):
+    blobs = list_all_file_name_gcs(table_name, gcp_conn_id, bucket_name, prefix_name)
+
+    file = ''
+    loaded_batch = 0
+
+    if blobs:
+        for file_check in blobs:
+            if get_unix_timestamp_from_filename(file_check) > loaded_batch:
+                file = file_check
+                loaded_batch = get_unix_timestamp_from_filename(file_check)
+    
+    return file, loaded_batch
+
 def get_schema_field_load_layer(table_name):
     import os
     import json
