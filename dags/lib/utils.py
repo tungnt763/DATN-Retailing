@@ -286,7 +286,7 @@ def get_edw_expressions_for_table(table_name, metadata_file_name, input_dataset,
 
     columns_except_natural_key_expr = ",\n        ".join([f"{col['physical_name']} = source.{col['physical_name']}" for col in columns if col["pk"] != "Y" and col["nk"] != "Y"])
 
-    columns_except_natural_key_equal_expr = "\n    AND ".join([f"target.{col['physical_name']} = source.{col['physical_name']}" for col in columns if col["pk"] != "Y" and col["nk"] != "Y"])
+    columns_except_natural_key_equal_expr = "\n    AND ".join([f"target.{col['physical_name']} = source.{col['physical_name']}" for col in columns if col["pk"] != "Y" and col["nk"] != "Y" and col["method"] == ""])
 
     new_columns = ", ".join([col["physical_name"] for col in columns])
 

@@ -5,42 +5,37 @@ import csv
 import tempfile
 import urllib.request
 import json
+import time
 from datetime import datetime
 import os
 
 def fetch_weather(lat, lon, date, city, country):
+    API_KEY = os.getenv("VISUAL_CROSSING_API_KEY")  # Cần đặt biến môi trường trong Airflow hoặc .env
     url = (
-        "https://archive-api.open-meteo.com/v1/archive?"
-        f"latitude={lat}&longitude={lon}&start_date={date}&end_date={date}"
-        "&hourly=temperature_2m,rain,showers,snowfall&timezone=UTC"
+        f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/"
+        f"{lat},{lon}/{date}?unitGroup=metric&key={API_KEY}&contentType=json"
     )
+    print(url)
     try:
         with urllib.request.urlopen(url, timeout=10) as response:
             data = json.loads(response.read())
-            temps = data['hourly'].get('temperature_2m', [])
-            rain = data['hourly'].get('rain', [])
-            showers = data['hourly'].get('showers', [])
-            snowfall = data['hourly'].get('snowfall', [])
-            temp_avg = sum(temps)/len(temps) if temps else None
-            rain_sum = sum(rain) if rain else None
-            showers_sum = sum(showers) if showers else None
-            snowfall_sum = sum(snowfall) if snowfall else None
+            day_data = data.get('days', [{}])[0]
+
             return {
                 "weather_date": date,
                 "city": city,
                 "country": country,
                 "latitude": lat,
                 "longitude": lon,
-                "temperature_avg": temp_avg,
-                "precipitation": rain_sum,
-                "rain": rain_sum,
-                "showers": showers_sum,
-                "snowfall": snowfall_sum,
+                "temperature_avg": day_data.get("temp"),        # Nhiệt độ trung bình (°C)
+                "precipitation": day_data.get("precip", 0),        # Tổng lượng mưa (mm)
+                "rain": day_data.get("precipcover", 0),            
+                "showers": day_data.get("precipprob", 0),       # Xác suất mưa (%)
+                "snowfall": day_data.get("snow", 0),               # Lượng tuyết rơi (mm)
             }
     except Exception as e:
         print(f"❌ Weather fetch error for {lat},{lon},{date}: {e}")
         return None
-
 
 @task(provide_context=True)
 def fetch_and_upload_weather_to_gcs(gcp_conn_id, project_name, dataset_name, bucket_name, table_name, **context):
@@ -69,7 +64,6 @@ def fetch_and_upload_weather_to_gcs(gcp_conn_id, project_name, dataset_name, buc
 
     # Step 2️⃣: Fetch từ Open-Meteo API
     for _, row in rows.iterrows():
-        print(f"Fetching weather data for {row.weather_date}, {row.city}, {row.country}")
         rec = fetch_weather(row.latitude, row.longitude, row.weather_date, row.city, row.country)
         if rec:
             weather_records.append(rec)

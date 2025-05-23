@@ -68,7 +68,10 @@ services:
 
   airflow-worker:
     <<: *airflow-common
+    deploy:
+      replicas: 2
     command: celery worker
+
 
   airflow-triggerer:
     <<: *airflow-common
@@ -83,6 +86,14 @@ services:
       --lastname User \
       --role Admin \
       --email thanhtungco14@gmail.com"
+    environment:
+      <<: *airflow-env
+
+  flower:
+    <<: *airflow-common
+    command: celery flower
+    ports:
+      - "5555:5555"
     environment:
       <<: *airflow-env
 
