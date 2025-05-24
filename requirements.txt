@@ -1,4 +1,7 @@
 apache-airflow-providers-google==10.3.0
+apache-airflow-providers-openlineage>=1.8.0
 soda-core-bigquery==3.0.45
 acryl-datahub-airflow-plugin[plugin-v1,datahub-kafka]
 datahub[airflow]
+apache-airflow-providers-apache-spark
+pyspark==3.5.0

@@ -15,4 +15,7 @@ include/soda/edw_cleaned/configuration.yml
 include/soda/edw/configuration.yml
 
 superset/
+spark-jars/
+
+jars.tar.gz
 

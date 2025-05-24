@@ -1,48 +1,78 @@
-from airflow.decorators import task
-from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
-from airflow.providers.google.cloud.hooks.gcs import GCSHook
-import csv
-import tempfile
+from pyspark.sql import SparkSession
+from datetime import datetime
 import urllib.request
 import json
-import time
-from datetime import datetime
+import argparse
 import os
+from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
+from airflow.providers.google.cloud.hooks.gcs import GCSHook
 
-def fetch_weather(lat, lon, date, city, country):
-    API_KEY = os.getenv("VISUAL_CROSSING_API_KEY")  # Cần đặt biến môi trường trong Airflow hoặc .env
-    url = (
-        f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/"
-        f"{lat},{lon}/{date}?unitGroup=metric&key={API_KEY}&contentType=json"
-    )
-    print(url)
-    try:
-        with urllib.request.urlopen(url, timeout=10) as response:
-            data = json.loads(response.read())
-            day_data = data.get('days', [{}])[0]
 
-            return {
-                "weather_date": date,
-                "city": city,
-                "country": country,
-                "latitude": lat,
-                "longitude": lon,
-                "temperature_avg": day_data.get("temp"),        # Nhiệt độ trung bình (°C)
-                "precipitation": day_data.get("precip", 0),        # Tổng lượng mưa (mm)
-                "rain": day_data.get("precipcover", 0),            
-                "showers": day_data.get("precipprob", 0),       # Xác suất mưa (%)
-                "snowfall": day_data.get("snow", 0),               # Lượng tuyết rơi (mm)
-            }
-    except Exception as e:
-        print(f"❌ Weather fetch error for {lat},{lon},{date}: {e}")
-        return None
+def fetch_partition(partition):
+    result = []
+    with open("/tmp/spark_worker_log.txt", "a") as log:
+        for row in partition:
+            log.write(f"Fetching {row.weather_date} - {row.latitude},{row.longitude}\n")
+            try:
+                url = (
+                    "https://archive-api.open-meteo.com/v1/archive?"
+                    f"latitude={row.latitude}&longitude={row.longitude}&start_date={row.weather_date}&end_date={row.weather_date}"
+                    "&hourly=temperature_2m,rain,showers,snowfall&timezone=UTC"
+                )
+                with urllib.request.urlopen(url, timeout=10) as response:
+                    data = json.loads(response.read())
+                    temps = data['hourly'].get('temperature_2m', [])
+                    rain = data['hourly'].get('rain', [])
+                    showers = data['hourly'].get('showers', [])
+                    snowfall = data['hourly'].get('snowfall', [])
+                    temp_avg = sum(temps)/len(temps) if temps else None
+                    rain_sum = sum(rain) if rain else 0
+                    showers_sum = sum(showers) if showers else 0
+                    snowfall_sum = sum(snowfall) if snowfall else 0
+                    precipitation = rain_sum + showers_sum + snowfall_sum
+                    result.append((
+                        row.weather_date,
+                        row.city,
+                        row.country,
+                        row.latitude,
+                        row.longitude,
+                        temp_avg,
+                        precipitation,
+                        rain_sum,
+                        showers_sum,
+                        snowfall_sum,
+                    ))
+            except Exception as e:
+                log.write(f"Failed fetch: {e}\n")
+    return iter(result)
 
-@task(provide_context=True)
-def fetch_and_upload_weather_to_gcs(gcp_conn_id, project_name, dataset_name, bucket_name, table_name, **context):
 
-    # Step 1️⃣: Query BigQuery để lấy (date, lat, lon, city, country)
-    bq = BigQueryHook(gcp_conn_id=gcp_conn_id, use_legacy_sql=False)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--project_name", required=True)
+    parser.add_argument("--dataset_name", required=True)
+    parser.add_argument("--table_name", required=True)
+    parser.add_argument("--bucket_name", required=True)
+    parser.add_argument("--gcp_conn_id", required=True)
+    args = parser.parse_args()
 
+    # Spark Session
+    spark = SparkSession.builder \
+        .appName("weather-fetch") \
+        .config("spark.hadoop.fs.gs.impl", "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem") \
+        .config("spark.hadoop.google.cloud.auth.service.account.enable", "true") \
+        .config("spark.hadoop.google.cloud.auth.service.account.json.keyfile", "/opt/airflow/include/gcp/service_account.json") \
+        .getOrCreate()
+
+    timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+    tmp_prefix = f"tmp/weather_{timestamp}/"
+    final_path = f"raw/weather/weather_{timestamp}.csv"
+
+    gcs_tmp_uri = f"gs://{args.bucket_name}/{tmp_prefix}"
+    gcs_final_uri = f"gs://{args.bucket_name}/{final_path}"
+
+    # Read from BigQuery
+    bq_hook = BigQueryHook(gcp_conn_id=args.gcp_conn_id, use_legacy_sql=False)
     sql = f"""
         SELECT DISTINCT
             FORMAT_DATE('%Y-%m-%d', DATE(trn_date)) AS weather_date,
@@ -50,47 +80,60 @@ def fetch_and_upload_weather_to_gcs(gcp_conn_id, project_name, dataset_name, buc
             CAST(s.str_lon AS FLOAT64) AS longitude,
             s.str_city AS city,
             s.str_cntry AS country
-        FROM `{project_name}.{dataset_name}.transactions` t
-        JOIN `{project_name}.{dataset_name}.stores` s
+        FROM `{args.project_name}.{args.dataset_name}.transactions` t
+        JOIN `{args.project_name}.{args.dataset_name}.stores` s
         ON t.trn_str_id = s.str_id
         WHERE s.str_lat IS NOT NULL AND s.str_lon IS NOT NULL
     """
+    df = bq_hook.get_pandas_df(sql)
+    print(f"✅ Retrieved {len(df)} records from BigQuery")
 
-    rows = bq.get_pandas_df(sql=sql, dialect="standard")
+    if df.empty:
+        print("⚠️ No data to process. Exiting.")
+        spark.stop()
+        exit(0)
 
-    print(f"✅ Retrieved {len(rows)} unique (date, lat, lon) combinations.")
+    # Process with Spark
+    df_spark = spark.createDataFrame(df)
+    df_spark = df_spark.withColumn("latitude", df_spark["latitude"].cast("double"))
+    df_spark = df_spark.withColumn("longitude", df_spark["longitude"].cast("double"))
 
-    weather_records = []
+    weather_rdd = df_spark.rdd.mapPartitions(fetch_partition)
+    # print("⏳ Triggering RDD execution for debug")
+    # print("RDD count:", weather_rdd.count())
 
-    # Step 2️⃣: Fetch từ Open-Meteo API
-    for _, row in rows.iterrows():
-        rec = fetch_weather(row.latitude, row.longitude, row.weather_date, row.city, row.country)
-        if rec:
-            weather_records.append(rec)
-
-    print(f"✅ Total weather records fetched: {len(weather_records)}")
-
-    # Step 3️⃣: Ghi file CSV tạm
-    if not weather_records:
-        print("⚠️ No weather data to write.")
-        return
-
-    fields = [
+    columns = [
         "weather_date", "city", "country", "latitude", "longitude",
         "temperature_avg", "precipitation", "rain", "showers", "snowfall"
     ]
+    result_df = spark.createDataFrame(weather_rdd, columns)
 
-    with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.csv') as tmpfile:
-        writer = csv.DictWriter(tmpfile, fieldnames=fields)
-        writer.writeheader()
-        writer.writerows(weather_records)
-        tmpfile_path = tmpfile.name
+    # Save as single part file
+    result_df.coalesce(1).write \
+        .mode("overwrite") \
+        .option("header", True) \
+        .csv(gcs_tmp_uri)
 
-    # Step 4️⃣: Upload lên GCS
-    gcs = GCSHook(gcp_conn_id=gcp_conn_id)
-    object_path = f"raw/{table_name}/{table_name}_{context['ts_nodash']}.csv"
-    gcs.upload(bucket_name=bucket_name, object_name=object_path, filename=tmpfile_path)
+    spark.stop()
 
-    print(f"✅ Uploaded weather file to gs://{bucket_name}/{object_path}")
+    # Rename part file -> final csv using GCSHook
+    gcs_hook = GCSHook(gcp_conn_id=args.gcp_conn_id)
+    files = gcs_hook.list(bucket_name=args.bucket_name, prefix=tmp_prefix)
 
-    os.remove(tmpfile_path)
+    part_file = next((f for f in files if f.endswith(".csv") and "part-" in f), None)
+    if not part_file:
+        raise Exception("No part CSV file found in GCS temp path")
+
+    gcs_hook.copy(
+        source_bucket=args.bucket_name,
+        source_object=part_file,
+        destination_bucket=args.bucket_name,
+        destination_object=final_path
+    )
+    print(f"✅ Renamed {part_file} -> {final_path}")
+
+    # Cleanup temp files
+    for f in files:
+        gcs_hook.delete(bucket_name=args.bucket_name, object_name=f)
+
+    print(f"✅ Weather data written to: {gcs_final_uri}")
