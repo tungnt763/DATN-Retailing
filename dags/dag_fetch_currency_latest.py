@@ -1,7 +1,11 @@
 from airflow.decorators import dag, task
 from resources.python_task.fetch_currency_rates import fetch_currency_rates
 from datetime import datetime, timedelta
-import os
+from lib.utils import load_db_env
+
+db_env = load_db_env()
+_gcp_conn_id = db_env.get('gcp_conn_id')
+_bucket_name = db_env.get('bucket_name')
 
 default_args = {
     'depends_on_past': False,
@@ -21,10 +25,10 @@ default_args = {
 )
 def fetch_currency_latest():
     
-    fetch_currency_latest_task = fetch_currency_rates(
-        output_path=os.path.join(os.path.dirname("AIRFLOW_HOME"), "include", "dataset", "currency.csv")
+    fetch_currency_rates(
+        gcp_conn_id=_gcp_conn_id,
+        bucket_name=_bucket_name,
+        table_name='currency'
     )
 
-    fetch_currency_latest_task
-
-dag_fetch_currency_latest = fetch_currency_latest()
+fetch_currency_latest()
