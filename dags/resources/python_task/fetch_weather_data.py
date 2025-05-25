@@ -90,6 +90,8 @@ async def fetch_all_weather_in_batches(rows: pd.DataFrame, batch_size=100):
             batch_results = await asyncio.gather(*tasks)
             results.extend([r for r in batch_results if r])
             print(f"✅ Completed batch {i // batch_size + 1}/{(len(rows) - 1) // batch_size + 1} — total fetched: {len(results)}")
+            if i // batch_size + 1 == (len(rows) - 1) // batch_size + 1:
+                break
             await asyncio.sleep(60)  # cooldown để tránh giới hạn mỗi phút
 
     return results

@@ -23,8 +23,6 @@ def loading_layer(**kwargs):
     _gcp_conn_id = kwargs.get('gcp_conn_id')
 
     # >>>>> SQL templates <<<<<
-    _sql_template_create_temp_table = os.path.join("resources", "sql_template", _dataset_name, "create_temp_table.sql")
-    _sql_template_staging = os.path.join("resources", "sql_template", _dataset_name, "insert_staging_to_temp_table.sql")
     _sql_template_temp = os.path.join("resources", "sql_template", _dataset_name, "insert_temp_to_load_table.sql")
     _sql_template_drop_staging_temp_table = os.path.join("resources", "sql_template", _dataset_name, "drop_staging_temp_table.sql")
 
@@ -32,7 +30,7 @@ def loading_layer(**kwargs):
     _schema_fields_list = get_schema_field_load_layer(_table_name)
     _schema_columns, _columns = get_schema_load_table(_table_name)
 
-    params={
+    params = {
         'project_name': _project_name,
         'dataset_name': _dataset_name,
         'table_name': _table_name,
@@ -40,59 +38,29 @@ def loading_layer(**kwargs):
         'columns': _columns,
     }
 
-    source_objects_list = list_all_file_name_gcs(_table_name, _gcp_conn_id, _bucket_name, _prefix_name)
+    @task(provide_context=True)
+    def get_file_path(**context):
+        return context["dag_run"].conf.get("file_path")
 
-    file, loaded_batch = get_file_and_loaded_batch(_table_name, _gcp_conn_id, _bucket_name, _prefix_name)
+    file_path = get_file_path()
 
     create_load_dataset = BigQueryCreateEmptyDatasetOperator(
-            task_id='create_load_dataset',
-            gcp_conn_id=_gcp_conn_id,
-            dataset_id=_dataset_name,
-            project_id=_project_name,
-            location='US',
-            exists_ok=True,
-        )
-
-    create_temp_table = BigQueryInsertJobOperator(
-        task_id=f'create_temp_table_{_table_name}',
+        task_id='create_load_dataset',
         gcp_conn_id=_gcp_conn_id,
-        configuration={
-            "query": {
-                "query": "{% include '" + _sql_template_create_temp_table + "' %}",
-                "useLegacySql": False,
-            }
-        },
-        params=params,
-        location='US', 
+        dataset_id=_dataset_name,
+        project_id=_project_name,
+        location='US',
+        exists_ok=True,
     )
 
-    load_data_to_staging = GCSToBigQueryOperator(
-        task_id=f"load_{_table_name}_gcs_to_staging",
+    load_data_to_temp = GCSToBigQueryOperator(
+        task_id=f"load_{_table_name}_gcs_to_temp",
         gcp_conn_id=_gcp_conn_id,
         bucket=_bucket_name,
-        source_objects=[file],
-        destination_project_dataset_table=f"{_project_name}.{_dataset_name}.{_table_name}_staging",
+        source_objects=[file_path],
+        destination_project_dataset_table=f"{_project_name}.{_dataset_name}.{_table_name}_temp",
         schema_fields=_schema_fields_list,
         write_disposition="WRITE_TRUNCATE",
-    )
-
-    load_staging_to_temp = BigQueryInsertJobOperator(
-        task_id=f"load_{_table_name}_staging_to_temp",
-        gcp_conn_id=_gcp_conn_id,
-        configuration={
-            "query": {
-                "query": "{% include '" + _sql_template_staging + "' %}",
-                "useLegacySql": False,
-            }
-        },
-        location="US",
-        params={
-            "project_name": _project_name,
-            "dataset_name": _dataset_name,
-            "table_name": _table_name,
-            "columns": _columns,
-            "loaded_batch": loaded_batch
-        }
     )
 
     load_temp_to_table = BigQueryInsertJobOperator(
@@ -127,4 +95,4 @@ def loading_layer(**kwargs):
 
     insert_job = insert_job_task.override(task_id=f'insert_loaded_{_table_name}_job_to_log')(gcp_conn_id=_gcp_conn_id, dataset_name=_dataset_name, table_name=_table_name)
 
-    max_timestamp >> create_load_dataset >> create_temp_table >> load_data_to_staging >> load_staging_to_temp >> dqc >> load_temp_to_table >> drop_staging_temp_table >> insert_job
+    file_path >> max_timestamp >> create_load_dataset >> load_data_to_temp >> dqc >> load_temp_to_table >> drop_staging_temp_table >> insert_job

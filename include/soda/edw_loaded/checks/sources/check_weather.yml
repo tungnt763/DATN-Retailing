@@ -19,12 +19,12 @@ checks for weather_temp:
 - row_count > 0:
     name: weather should contain data
 - failed rows:
-    name: Column count should be exactly 16
+    name: Column count should be exactly 10
     fail query: |-
       SELECT COUNT(*) AS col_count
       FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
       WHERE table_name = 'weather_temp'
-      HAVING col_count != 16
+      HAVING col_count != 10
 - missing_count(wthr_date) = 0:
     name: Weather Date must not be null
 - invalid_count(wthr_date) = 0:

@@ -14,12 +14,12 @@ checks for currency_temp:
 - row_count > 0:
     name: currency should contain data
 - failed rows:
-    name: Column count should be exactly 11
+    name: Column count should be exactly 5
     fail query: |-
       SELECT COUNT(*) AS col_count
       FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
       WHERE table_name = 'currency_temp'
-      HAVING col_count != 11
+      HAVING col_count != 5
 - missing_count(crncy_cd) = 0:
     name: Currency Code must not be null
 - invalid_count(crncy_cd) = 0:

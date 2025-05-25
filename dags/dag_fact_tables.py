@@ -3,6 +3,11 @@ from airflow.decorators import dag, task, task_group
 from datetime import datetime, timedelta, timezone
 from airflow.providers.google.cloud.sensors.gcs import GCSObjectsWithPrefixExistenceSensor
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+from airflow.sensors.external_task import ExternalTaskSensor
+from airflow.utils.state import DagRunState
+from airflow.models.dagrun import DagRun
+from airflow.utils.session import provide_session
+
 from resources.business.task_group_loading_layer import loading_layer
 from resources.business.fact.task_group_cleaned_layer import clean_layer
 from resources.business.fact.task_group_edw_layer import edw_layer
@@ -39,30 +44,32 @@ def create_dag(_dag_id, _schedule, **kwargs):
     )
     def get_dag():
 
-        kwargs['loaded_batch'] = '{{ execution_date.int_timestamp }}'
-        
-        check_gcs_file = GCSObjectsWithPrefixExistenceSensor(
-            task_id=f'check_gcs_{kwargs.get("table_name")}_file',
-            bucket=kwargs.get('bucket_name'),
-            prefix=kwargs.get('prefix_name'), 
-            google_cloud_conn_id=kwargs.get('gcp_conn_id'),
-            timeout=300,
-            poke_interval=60,
-            soft_fail=True,
-            mode='reschedule',
-        )
-
         trigger_fetch_weather_dag = TriggerDagRunOperator(
             task_id="trigger_fetch_weather_dag",
             trigger_dag_id="fetch_weather_data",
             wait_for_completion=True
         )
 
-        trigger_weather_dag = TriggerDagRunOperator(
-            task_id="trigger_weather_dag",
-            trigger_dag_id="dag_weather",
-            wait_for_completion=True
-        )
+        @task(provide_context=True, retries=10, retry_delay=timedelta(seconds=60))
+        @provide_session
+        def wait_for_dag_weather(session=None, **context):
+            current_dt = context["execution_date"]
+
+            dagrun = (
+                session.query(DagRun)
+                .filter(
+                    DagRun.dag_id == 'dag_weather',
+                    DagRun.execution_date > current_dt,
+                    DagRun.state == DagRunState.SUCCESS,
+                )
+                .order_by(DagRun.execution_date.asc())
+                .first()
+            )
+
+            if dagrun:
+                print(f"✅ Found DAG run: {dagrun.run_id} at {dagrun.execution_date}")
+            else:
+                raise ValueError("DAG dag_weather doesn't run successfully")
 
         loading_layer_task_group = loading_layer(**kwargs)
 
@@ -70,15 +77,13 @@ def create_dag(_dag_id, _schedule, **kwargs):
 
         edw_layer_task_group = edw_layer(**kwargs)
 
-        archive_gcs_files_task = archive_gcs_files.override(task_id=f'archive_gcs_{kwargs.get("table_name")}_files')(kwargs.get('bucket_name'), kwargs.get('table_name'), kwargs.get('gcp_conn_id'), kwargs.get('prefix_name'))
-
-        check_gcs_file >> loading_layer_task_group >> clean_layer_task_group >> trigger_fetch_weather_dag >> trigger_weather_dag >> edw_layer_task_group >> archive_gcs_files_task
+        loading_layer_task_group >> clean_layer_task_group >> trigger_fetch_weather_dag >> wait_for_dag_weather() >> edw_layer_task_group
 
     get_dag()
 
 _table_name = 'transactions'
 _dag_id = f'dag_{_table_name}'
-_schedule = '0 0 * * *'
+_schedule = None
 
 config = {
     'dag_id': _dag_id,

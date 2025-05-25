@@ -40,28 +40,13 @@ def create_dag(_dag_id, _schedule, **kwargs):
     )
     def get_dag():
 
-        kwargs['loaded_batch'] = '{{ execution_date.int_timestamp }}'
-        
-        check_gcs_file = GCSObjectsWithPrefixExistenceSensor(
-            task_id=f'check_gcs_{kwargs.get("table_name")}_file',
-            bucket=kwargs.get('bucket_name'),
-            prefix=kwargs.get('prefix_name'), 
-            google_cloud_conn_id=kwargs.get('gcp_conn_id'),
-            timeout=300,
-            poke_interval=60,
-            soft_fail=True,
-            mode='reschedule',
-        )
-
         loading_layer_task_group = loading_layer(**kwargs)
 
         clean_layer_task_group = clean_layer(**kwargs)
 
         edw_layer_task_group = edw_layer(**kwargs)
 
-        archive_gcs_files_task = archive_gcs_files.override(task_id=f'archive_gcs_{kwargs.get("table_name")}_files')(kwargs.get('bucket_name'), kwargs.get('table_name'), kwargs.get('gcp_conn_id'), kwargs.get('prefix_name'))
-
-        check_gcs_file >> loading_layer_task_group >> clean_layer_task_group >> edw_layer_task_group >> archive_gcs_files_task
+        loading_layer_task_group >> clean_layer_task_group >> edw_layer_task_group
 
     get_dag()
 
@@ -70,7 +55,7 @@ for _table_name in _table_names:
         continue
 
     _dag_id = f'dag_{_table_name}'
-    _schedule = '0 1 * * *' if _table_name != 'weather' else None
+    _schedule = None
 
     config = {
         'dag_id': _dag_id,

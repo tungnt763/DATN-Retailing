@@ -22,6 +22,9 @@ x-airflow-common:
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
     AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
     AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+    AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth"
+    AIRFLOW__API__AUTH_BASIC_AUTH_USERNAME: "admin"
+    AIRFLOW__API__AUTH_BASIC_AUTH_PASSWORD: "admin"
     AIRFLOW__LOGGING__REMOTE_LOGGING: 'false'
     AIRFLOW__CORE__LAZY_LOAD_PLUGINS: 'False'
     AIRFLOW__DATAHUB__ENABLED: 'True'

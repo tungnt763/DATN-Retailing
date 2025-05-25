@@ -14,12 +14,12 @@ checks for discounts_temp:
 - row_count > 0:
     name: discounts should contain data
 - failed rows:
-    name: Column count should be exactly 12
+    name: Column count should be exactly 6
     fail query: |-
       SELECT COUNT(*) AS col_count
       FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
       WHERE table_name = 'discounts_temp'
-      HAVING col_count != 12
+      HAVING col_count != 6
 - missing_count(dscnt_start_date) = 0:
     name: Start Date must not be null
 - invalid_count(dscnt_start_date) = 0:
