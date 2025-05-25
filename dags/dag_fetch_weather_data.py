@@ -1,7 +1,7 @@
 from airflow.decorators import dag, task
+from resources.python_task.fetch_weather_data import fetch_and_upload_weather_to_gcs
 from datetime import datetime, timedelta
 from lib.utils import load_db_env
-from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 
 db_env = load_db_env()
 _gcp_conn_id = db_env.get('gcp_conn_id')
@@ -26,25 +26,12 @@ default_args = {
 )
 def fetch_weather_data():
 
-    fetch_and_upload_weather_to_gcs = SparkSubmitOperator(
-        task_id="fetch_and_upload_weather_to_gcs",
-        application="dags/resources/python_task/fetch_weather_data.py",
-        application_args=[
-            "--project_name", _project,
-            "--dataset_name", _clean_dataset,
-            "--table_name", "weather",
-            "--bucket_name", _bucket_name,
-            "--gcp_conn_id", _gcp_conn_id,
-        ],
-        conf={
-            "spark.executor.memory": "1g",
-            "spark.executor.cores": "1",
-            "spark.driver.memory": "1g"
-        },
-        jars="/opt/spark-extra-jars/gcs-connector-hadoop3-2.2.17-shaded.jar",
-        conn_id="spark_default",
+    fetch_and_upload_weather_to_gcs(
+        gcp_conn_id=_gcp_conn_id,
+        project_name=_project,
+        dataset_name=_clean_dataset,
+        bucket_name=_bucket_name,
+        table_name='weather'
     )
-
-    fetch_and_upload_weather_to_gcs
-
+    
 fetch_weather_data()

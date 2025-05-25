@@ -1,78 +1,107 @@
-from pyspark.sql import SparkSession
-from datetime import datetime
-import urllib.request
-import json
-import argparse
+import asyncio
+import aiohttp
+from aiohttp import ClientSession, TCPConnector
+from asyncio import Semaphore
+import pandas as pd
+import csv
+import tempfile
 import os
+from airflow.decorators import task
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 from airflow.providers.google.cloud.hooks.gcs import GCSHook
+import nest_asyncio
+nest_asyncio.apply()
 
+# ----------------------------
+# Async Weather API Caller with Retry Logic
+# ----------------------------
+async def fetch_weather_async(session: ClientSession, semaphore: Semaphore,
+                              lat: float, lon: float, date: str, city: str, country: str):
+    url = (
+        "https://archive-api.open-meteo.com/v1/archive?"
+        f"latitude={lat}&longitude={lon}&start_date={date}&end_date={date}"
+        "&hourly=temperature_2m,rain,showers,snowfall&timezone=UTC"
+    )
 
-def fetch_partition(partition):
-    result = []
-    with open("/tmp/spark_worker_log.txt", "a") as log:
-        for row in partition:
-            log.write(f"Fetching {row.weather_date} - {row.latitude},{row.longitude}\n")
+    async with semaphore:
+        for attempt in range(5):
             try:
-                url = (
-                    "https://archive-api.open-meteo.com/v1/archive?"
-                    f"latitude={row.latitude}&longitude={row.longitude}&start_date={row.weather_date}&end_date={row.weather_date}"
-                    "&hourly=temperature_2m,rain,showers,snowfall&timezone=UTC"
-                )
-                with urllib.request.urlopen(url, timeout=10) as response:
-                    data = json.loads(response.read())
-                    temps = data['hourly'].get('temperature_2m', [])
-                    rain = data['hourly'].get('rain', [])
-                    showers = data['hourly'].get('showers', [])
-                    snowfall = data['hourly'].get('snowfall', [])
-                    temp_avg = sum(temps)/len(temps) if temps else None
-                    rain_sum = sum(rain) if rain else 0
-                    showers_sum = sum(showers) if showers else 0
-                    snowfall_sum = sum(snowfall) if snowfall else 0
-                    precipitation = rain_sum + showers_sum + snowfall_sum
-                    result.append((
-                        row.weather_date,
-                        row.city,
-                        row.country,
-                        row.latitude,
-                        row.longitude,
-                        temp_avg,
-                        precipitation,
-                        rain_sum,
-                        showers_sum,
-                        snowfall_sum,
-                    ))
+                async with session.get(url, timeout=10) as response:
+                    data = await response.json()
+
+                    if data.get("reason", "").lower().startswith("minutely api request limit"):
+                        wait_time = 60 * (attempt + 1)
+                        print(f"⚠️ Rate limited, retrying in {wait_time} seconds for {lat},{lon},{date}")
+                        await asyncio.sleep(wait_time)
+                        continue
+
+                    if not isinstance(data, dict) or "hourly" not in data:
+                        raise ValueError(f"Missing 'hourly' in API response: {data}")
+
+                    hourly = data["hourly"]
+                    temps = hourly.get('temperature_2m', [])
+                    rain = hourly.get('rain', [])
+                    showers = hourly.get('showers', [])
+                    snowfall = hourly.get('snowfall', [])
+                    temp_avg = round(sum(temps)/len(temps), 2) if temps else None
+                    rain_sum = round(sum(rain), 2) if rain else None
+                    showers_sum = round(sum(showers), 2) if showers else None
+                    snowfall_sum = round(sum(snowfall), 2) if snowfall else None
+
+                    return {
+                        "weather_date": date,
+                        "city": city,
+                        "country": country,
+                        "latitude": lat,
+                        "longitude": lon,
+                        "temperature_avg": temp_avg,
+                        "precipitation": rain_sum,
+                        "rain": rain_sum,
+                        "showers": showers_sum,
+                        "snowfall": snowfall_sum,
+                    }
             except Exception as e:
-                log.write(f"Failed fetch: {e}\n")
-    return iter(result)
+                if attempt < 4:
+                    wait_time = 2 ** attempt
+                    print(f"❌ Error fetching ({lat},{lon},{date}): {e} - retrying in {wait_time}s")
+                    await asyncio.sleep(wait_time)
+                else:
+                    print(f"❌ Final failure for ({lat},{lon},{date}): {e}")
+                    return None
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--project_name", required=True)
-    parser.add_argument("--dataset_name", required=True)
-    parser.add_argument("--table_name", required=True)
-    parser.add_argument("--bucket_name", required=True)
-    parser.add_argument("--gcp_conn_id", required=True)
-    args = parser.parse_args()
+# ----------------------------
+# Batch controller
+# ----------------------------
+async def fetch_all_weather_in_batches(rows: pd.DataFrame, batch_size=100):
+    results = []
+    semaphore = Semaphore(10)
+    connector = TCPConnector(limit=20)
 
-    # Spark Session
-    spark = SparkSession.builder \
-        .appName("weather-fetch") \
-        .config("spark.hadoop.fs.gs.impl", "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem") \
-        .config("spark.hadoop.google.cloud.auth.service.account.enable", "true") \
-        .config("spark.hadoop.google.cloud.auth.service.account.json.keyfile", "/opt/airflow/include/gcp/service_account.json") \
-        .getOrCreate()
+    async with aiohttp.ClientSession(connector=connector) as session:
+        for i in range(0, len(rows), batch_size):
+            batch = rows.iloc[i:i+batch_size]
+            tasks = [
+                fetch_weather_async(session, semaphore,
+                                    row.latitude, row.longitude,
+                                    row.weather_date, row.city, row.country)
+                for _, row in batch.iterrows()
+            ]
+            batch_results = await asyncio.gather(*tasks)
+            results.extend([r for r in batch_results if r])
+            print(f"✅ Completed batch {i // batch_size + 1}/{(len(rows) - 1) // batch_size + 1} — total fetched: {len(results)}")
+            await asyncio.sleep(60)  # cooldown để tránh giới hạn mỗi phút
 
-    timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
-    tmp_prefix = f"tmp/weather_{timestamp}/"
-    final_path = f"raw/weather/weather_{timestamp}.csv"
+    return results
 
-    gcs_tmp_uri = f"gs://{args.bucket_name}/{tmp_prefix}"
-    gcs_final_uri = f"gs://{args.bucket_name}/{final_path}"
 
-    # Read from BigQuery
-    bq_hook = BigQueryHook(gcp_conn_id=args.gcp_conn_id, use_legacy_sql=False)
+# ----------------------------
+# Airflow task to fetch and upload
+# ----------------------------
+@task(provide_context=True)
+def fetch_and_upload_weather_to_gcs(gcp_conn_id, project_name, dataset_name, bucket_name, table_name, **context):
+    # Step 1️⃣: Lấy dữ liệu từ BigQuery
+    bq = BigQueryHook(gcp_conn_id=gcp_conn_id, use_legacy_sql=False)
     sql = f"""
         SELECT DISTINCT
             FORMAT_DATE('%Y-%m-%d', DATE(trn_date)) AS weather_date,
@@ -80,60 +109,36 @@ if __name__ == "__main__":
             CAST(s.str_lon AS FLOAT64) AS longitude,
             s.str_city AS city,
             s.str_cntry AS country
-        FROM `{args.project_name}.{args.dataset_name}.transactions` t
-        JOIN `{args.project_name}.{args.dataset_name}.stores` s
+        FROM `{project_name}.{dataset_name}.transactions` t
+        JOIN `{project_name}.{dataset_name}.stores` s
         ON t.trn_str_id = s.str_id
         WHERE s.str_lat IS NOT NULL AND s.str_lon IS NOT NULL
     """
-    df = bq_hook.get_pandas_df(sql)
-    print(f"✅ Retrieved {len(df)} records from BigQuery")
+    rows = bq.get_pandas_df(sql=sql)
+    print(f"✅ Retrieved {len(rows)} unique (date, lat, lon) combinations.")
 
-    if df.empty:
-        print("⚠️ No data to process. Exiting.")
-        spark.stop()
-        exit(0)
+    # Step 2️⃣: Gọi API thời tiết với batching + retry
+    weather_records = asyncio.run(fetch_all_weather_in_batches(rows))
+    print(f"✅ Total weather records fetched: {len(weather_records)}")
 
-    # Process with Spark
-    df_spark = spark.createDataFrame(df)
-    df_spark = df_spark.withColumn("latitude", df_spark["latitude"].cast("double"))
-    df_spark = df_spark.withColumn("longitude", df_spark["longitude"].cast("double"))
+    if not weather_records:
+        print("⚠️ No weather data to write.")
+        return
 
-    weather_rdd = df_spark.rdd.mapPartitions(fetch_partition)
-    # print("⏳ Triggering RDD execution for debug")
-    # print("RDD count:", weather_rdd.count())
-
-    columns = [
+    # Step 3️⃣: Ghi vào file CSV tạm
+    fields = [
         "weather_date", "city", "country", "latitude", "longitude",
         "temperature_avg", "precipitation", "rain", "showers", "snowfall"
     ]
-    result_df = spark.createDataFrame(weather_rdd, columns)
+    with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.csv') as tmpfile:
+        writer = csv.DictWriter(tmpfile, fieldnames=fields)
+        writer.writeheader()
+        writer.writerows(weather_records)
+        tmpfile_path = tmpfile.name
 
-    # Save as single part file
-    result_df.coalesce(1).write \
-        .mode("overwrite") \
-        .option("header", True) \
-        .csv(gcs_tmp_uri)
-
-    spark.stop()
-
-    # Rename part file -> final csv using GCSHook
-    gcs_hook = GCSHook(gcp_conn_id=args.gcp_conn_id)
-    files = gcs_hook.list(bucket_name=args.bucket_name, prefix=tmp_prefix)
-
-    part_file = next((f for f in files if f.endswith(".csv") and "part-" in f), None)
-    if not part_file:
-        raise Exception("No part CSV file found in GCS temp path")
-
-    gcs_hook.copy(
-        source_bucket=args.bucket_name,
-        source_object=part_file,
-        destination_bucket=args.bucket_name,
-        destination_object=final_path
-    )
-    print(f"✅ Renamed {part_file} -> {final_path}")
-
-    # Cleanup temp files
-    for f in files:
-        gcs_hook.delete(bucket_name=args.bucket_name, object_name=f)
-
-    print(f"✅ Weather data written to: {gcs_final_uri}")
+    # Step 4️⃣: Upload lên GCS
+    gcs = GCSHook(gcp_conn_id=gcp_conn_id)
+    object_path = f"raw/{table_name}/{table_name}_{context['ts_nodash']}.csv"
+    gcs.upload(bucket_name=bucket_name, object_name=object_path, filename=tmpfile_path)
+    print(f"✅ Uploaded weather file to gs://{bucket_name}/{object_path}")
+    os.remove(tmpfile_path)
