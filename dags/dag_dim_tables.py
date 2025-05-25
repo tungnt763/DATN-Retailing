@@ -5,7 +5,6 @@ from airflow.providers.google.cloud.sensors.gcs import GCSObjectsWithPrefixExist
 from resources.business.task_group_loading_layer import loading_layer
 from resources.business.dim.task_group_cleaned_layer import clean_layer
 from resources.business.dim.task_group_edw_layer import edw_layer
-from resources.python_task.archive_files_task import archive_gcs_files
 from lib.utils import load_db_env, get_table_names
 
 HOME = os.getenv('AIRFLOW_HOME')
