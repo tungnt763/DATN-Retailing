@@ -95,7 +95,7 @@ def fetch_location_data(gcp_conn_id, project_name, dataset_name, table_name, buc
             FROM `{project_name}.{dataset_name}.{table_name}` c
             WHERE NOT EXISTS (
                 SELECT 1 FROM `{project_name}.edw.dim_locations` l
-                WHERE c.cstmr_city = l.raw_city AND c.cstmr_cntry = l.raw_cntry
+                WHERE c.cstmr_city = l.lct_raw_city AND c.cstmr_cntry = l.lct_raw_cntry
             )
         """
         df = bq.get_pandas_df(sql=sql)
