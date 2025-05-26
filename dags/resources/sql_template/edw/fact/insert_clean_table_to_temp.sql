@@ -38,6 +38,12 @@ JOIN `datn-retailing.edw.dim_weather` AS w
     ON DATE(t.trn_date) = w.wthr_date
     AND s.str_lat = w.wthr_lat
     AND s.str_lon = w.wthr_lon
+JOIN `datn-retailing.edw.dim_locations` AS l1
+    ON ctm.cstmr_city = l1.lct_raw_city
+    AND ctm.cstmr_cntry = l1.lct_raw_cntry
+JOIN `datn-retailing.edw.dim_locations` AS l2
+    ON s.str_city = l2.lct_raw_city
+    AND s.str_cntry = l2.lct_raw_cntry
 WHERE
     t.create_date > TIMESTAMP('{{ task_instance.xcom_pull(task_ids="clean_layer.get_max_timestamp", key="max_timestamp") }}')
 ;

@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS `datn-retailing.edw.fact_transactions` (
     trn_emply_key             STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Employee Key\", \"clmn_desc\": \"Employee Key of the fact_transactions table\"}"),
     trn_dscnt_key             STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Discount Key\", \"clmn_desc\": \"Discount Key of the fact_transactions table\"}"),
     trn_crncy_key             STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Currency Key\", \"clmn_desc\": \"Currency Key of the fact_transactions table\"}"),
+    trn_cstmr_lct_key         STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Customer Location Key\", \"clmn_desc\": \"Customer Location Key of the fact_transactions table\"}"),
+    trn_str_lct_key           STRING NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Store Location Key\", \"clmn_desc\": \"Store Location Key of the fact_transactions table\"}"),
     trn_sale_qty              INT64 NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Sale Quantity\", \"clmn_desc\": \"Sale Quantity of the fact_transactions table\"}"),
     trn_reg_unit_prc          NUMERIC NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Regular Unit Price\", \"clmn_desc\": \"Regular Unit Price of the fact_transactions table\"}"),
     trn_dscnt_unit_prc        NUMERIC NOT NULL OPTIONS(description="{\"clmn_lgcl_name_eng\": \"Discount Unit Price \", \"clmn_desc\": \"Discount Unit Price  of the fact_transactions table\"}"),

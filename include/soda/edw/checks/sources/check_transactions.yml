@@ -12,6 +12,8 @@ checks for fact_transactions:
       - trn_emply_key
       - trn_dscnt_key
       - trn_crncy_key
+      - trn_cstmr_lct_key
+      - trn_str_lct_key
       - trn_sale_qty
       - trn_reg_unit_prc
       - trn_dscnt_unit_prc
@@ -33,6 +35,8 @@ checks for fact_transactions:
         trn_emply_key: string
         trn_dscnt_key: string
         trn_crncy_key: string
+        trn_cstmr_lct_key: string
+        trn_str_lct_key: string
         trn_sale_qty: int64
         trn_reg_unit_prc: numeric
         trn_dscnt_unit_prc: numeric
@@ -70,6 +74,10 @@ checks for fact_transactions:
     name: Discount Key must not be null
 - missing_count(trn_crncy_key) = 0:
     name: Currency Key must not be null
+- missing_count(trn_cstmr_lct_key) = 0:
+    name: Customer Location Key must not be null
+- missing_count(trn_str_lct_key) = 0:
+    name: Store Location Key must not be null
 - missing_count(trn_sale_qty) = 0:
     name: Sale Quantity must not be null
 - missing_count(trn_reg_unit_prc) = 0:
