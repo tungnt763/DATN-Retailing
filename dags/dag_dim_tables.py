@@ -6,6 +6,7 @@ from resources.business.task_group_loading_layer import loading_layer
 from resources.business.dim.task_group_cleaned_layer import clean_layer
 from resources.business.dim.task_group_edw_layer import edw_layer
 from lib.utils import load_db_env, get_table_names
+from resources.python_task.fetch_location_data import fetch_location_data
 
 HOME = os.getenv('AIRFLOW_HOME')
 
@@ -45,7 +46,11 @@ def create_dag(_dag_id, _schedule, **kwargs):
 
         edw_layer_task_group = edw_layer(**kwargs)
 
-        loading_layer_task_group >> clean_layer_task_group >> edw_layer_task_group
+        if kwargs.get('table_name') in ['stores', 'customers']:
+            loading_layer_task_group >> clean_layer_task_group >> fetch_location_data(gcp_conn_id=kwargs.get('gcp_conn_id'), project_name=kwargs.get('project'), dataset_name=kwargs.get('clean_dataset'), table_name=kwargs.get('table_name'), bucket_name=kwargs.get('bucket_name')) >> edw_layer_task_group
+        else:
+            loading_layer_task_group >> clean_layer_task_group >> edw_layer_task_group
+
 
     get_dag()
 

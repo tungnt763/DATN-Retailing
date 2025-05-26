@@ -8,3 +8,5 @@ pyspark==3.5.0
 nest_asyncio
 aiohttp
 asyncio
+geopy
+google-cloud-translate

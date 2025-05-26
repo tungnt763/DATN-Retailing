@@ -1,0 +1,29 @@
+checks for dim_locations:
+- schema:
+    fail:
+      when required column missing:
+      - lct_surr_key
+      - lct_raw_city
+      - lct_raw_cntry
+      - lct_tr_city
+      - lct_tr_cntry
+      when wrong column type:
+        lct_surr_key: string
+        lct_raw_city: string
+        lct_raw_cntry: string
+        lct_tr_city: string
+        lct_tr_cntry: string
+- row_count > 0:
+    name: dim_locations should contain data
+- duplicate_count(lct_surr_key) = 0:
+    name: (lct_surr_key) must be unique
+- missing_count(lct_surr_key) = 0:
+    name: Location Surrogate Key must not be null
+- missing_count(lct_raw_city) = 0:
+    name: Raw City must not be null
+- missing_count(lct_raw_cntry) = 0:
+    name: Raw Country must not be null
+- missing_count(lct_tr_city) = 0:
+    name: Translated City must not be null
+- missing_count(lct_tr_cntry) = 0:
+    name: Translated Country must not be null

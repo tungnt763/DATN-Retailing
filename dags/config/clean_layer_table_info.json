@@ -1152,5 +1152,72 @@
         "default_value": ""
       }
     ]
+  },
+  "locations": {
+    "physical_name": "locations",
+    "logical_name_en": "Locations",
+    "col_nums": "4",
+    "columns": [
+      {
+        "logical_name_en": "Raw City",
+        "physical_name": "lct_raw_city",
+        "type": "STRING",
+        "index": "1",
+        "pk": "Y",
+        "mode": "REQUIRED",
+        "format": "",
+        "min": "",
+        "max": "",
+        "values": [],
+        "regax": "",
+        "other": "",
+        "default_value": ""
+      },
+      {
+        "logical_name_en": "Raw Country",
+        "physical_name": "lct_raw_cntry",
+        "type": "STRING",
+        "index": "2",
+        "pk": "Y",
+        "mode": "REQUIRED",
+        "format": "",
+        "min": "",
+        "max": "",
+        "values": [],
+        "regax": "",
+        "other": "",
+        "default_value": ""
+      },
+      {
+        "logical_name_en": "Translated City",
+        "physical_name": "lct_tr_city",
+        "type": "STRING",
+        "index": "3",
+        "pk": "N",
+        "mode": "REQUIRED",
+        "format": "",
+        "min": "",
+        "max": "",
+        "values": [],
+        "regax": "",
+        "other": "",
+        "default_value": ""
+      },
+      {
+        "logical_name_en": "Translated Country",
+        "physical_name": "lct_tr_cntry",
+        "type": "STRING",
+        "index": "4",
+        "pk": "N",
+        "mode": "REQUIRED",
+        "format": "",
+        "min": "",
+        "max": "",
+        "values": [],
+        "regax": "",
+        "other": "",
+        "default_value": ""
+      }
+    ]
   }
 }

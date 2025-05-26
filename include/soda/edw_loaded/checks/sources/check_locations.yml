@@ -1,0 +1,30 @@
+checks for locations_temp:
+- schema:
+    fail:
+      when required column missing:
+      - lct_raw_city
+      - lct_raw_cntry
+      - lct_tr_city
+      - lct_tr_cntry
+      when wrong column type:
+        lct_raw_city: string
+        lct_raw_cntry: string
+        lct_tr_city: string
+        lct_tr_cntry: string
+- row_count > 0:
+    name: locations should contain data
+- failed rows:
+    name: Column count should be exactly 4
+    fail query: |-
+      SELECT COUNT(*) AS col_count
+      FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
+      WHERE table_name = 'locations_temp'
+      HAVING col_count != 4
+- missing_count(lct_raw_city) = 0:
+    name: Raw City must not be null
+- missing_count(lct_raw_cntry) = 0:
+    name: Raw Country must not be null
+- missing_count(lct_tr_city) = 0:
+    name: Translated City must not be null
+- missing_count(lct_tr_cntry) = 0:
+    name: Translated Country must not be null

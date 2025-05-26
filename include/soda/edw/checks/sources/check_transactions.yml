@@ -5,6 +5,7 @@ checks for fact_transactions:
       - trn_id
       - trn_hr
       - trn_dt_key
+      - trn_wthr_key
       - trn_cstmr_key
       - trn_prd_key
       - trn_str_key
@@ -25,6 +26,7 @@ checks for fact_transactions:
         trn_id: string
         trn_hr: string
         trn_dt_key: string
+        trn_wthr_key: string
         trn_cstmr_key: string
         trn_prd_key: string
         trn_str_key: string
@@ -54,6 +56,8 @@ checks for fact_transactions:
     name: Transaction Hour must not be null
 - missing_count(trn_dt_key) = 0:
     name: Date Key must not be null
+- missing_count(trn_wthr_key) = 0:
+    name: Weather Key must not be null
 - missing_count(trn_cstmr_key) = 0:
     name: Customer Key must not be null
 - missing_count(trn_prd_key) = 0:

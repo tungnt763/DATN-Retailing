@@ -1083,5 +1083,74 @@
         "default_value": ""
       }
     ]
+  },
+  "locations": {
+    "physical_name": "dim_locations",
+    "table_type": "dimension",
+    "scd_type": "scd1",
+    "logical_name_en": "Dim Locations",
+    "col_nums": "5",
+    "columns": [
+      {
+        "logical_name_en": "Location Surrogate Key",
+        "physical_name": "lct_surr_key",
+        "type": "STRING",
+        "index": "1",
+        "pk": "Y",
+        "nk": "N",
+        "mode": "REQUIRED",
+        "method": "",
+        "other": "",
+        "default_value": ""
+      },
+      {
+        "logical_name_en": "Raw City",
+        "physical_name": "lct_raw_city",
+        "type": "STRING",
+        "index": "2",
+        "pk": "N",
+        "nk": "Y",
+        "mode": "REQUIRED",
+        "method": "",
+        "other": "",
+        "default_value": ""
+      }, 
+      {
+        "logical_name_en": "Raw Country",
+        "physical_name": "lct_raw_cntry",
+        "type": "STRING",
+        "index": "3",
+        "pk": "N",
+        "nk": "Y",
+        "mode": "REQUIRED",
+        "method": "",
+        "other": "",
+        "default_value": ""
+      },
+      {
+        "logical_name_en": "Translated City",
+        "physical_name": "lct_tr_city",
+        "type": "STRING",
+        "index": "4",
+        "pk": "N",
+        "nk": "N",
+        "mode": "REQUIRED",
+        "method": "",
+        "other": "",
+        "default_value": ""
+      },
+      {
+        "logical_name_en": "Translated Country",
+        "physical_name": "lct_tr_cntry",
+        "type": "STRING",
+        "index": "5",
+        "pk": "N",
+        "nk": "N",
+        "mode": "REQUIRED",
+        "method": "",
+        "other": "",
+        "default_value": ""
+      }
+    ]
   }
 }
