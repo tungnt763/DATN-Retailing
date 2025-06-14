@@ -1,13 +1,13 @@
 CREATE TABLE IF NOT EXISTS `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}_invalid` AS
 SELECT
     *
-FROM `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}_temp`
+FROM `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}_temp_{{ task_instance.dag_run.conf.loaded_batch }}`
 WHERE FALSE;
 
 INSERT INTO `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}_invalid`
 SELECT
     *
-FROM `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}_temp`
+FROM `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}_temp_{{ task_instance.dag_run.conf.loaded_batch }}`
 WHERE 
     is_valid_cstmr_id = false
     OR is_valid_prd_id = false

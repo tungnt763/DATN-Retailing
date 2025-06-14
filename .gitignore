@@ -14,8 +14,11 @@ include/soda/edw_loaded/configuration.yml
 include/soda/edw_cleaned/configuration.yml
 include/soda/edw/configuration.yml
 
-superset/
+superset/*
+!superset/docker-compose-image-tag.yml
 spark-jars/
 
 jars.tar.gz
+
+full_zsh_history.txt
 

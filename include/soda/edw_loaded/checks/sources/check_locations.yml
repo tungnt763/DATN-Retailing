@@ -1,4 +1,4 @@
-checks for locations_temp:
+checks for locations:
 - schema:
     fail:
       when required column missing:
@@ -14,12 +14,12 @@ checks for locations_temp:
 - row_count > 0:
     name: locations should contain data
 - failed rows:
-    name: Column count should be exactly 4
+    name: Column count should be exactly 10
     fail query: |-
       SELECT COUNT(*) AS col_count
       FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
-      WHERE table_name = 'locations_temp'
-      HAVING col_count != 4
+      WHERE table_name = 'locations'
+      HAVING col_count != 10
 - missing_count(lct_raw_city) = 0:
     name: Raw City must not be null
 - missing_count(lct_raw_cntry) = 0:

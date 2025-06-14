@@ -10,7 +10,7 @@ SELECT
     '{{ task_instance.task_id }}' AS create_task_id,
     '{{ task_instance.run_id }}' AS create_task_run_id
 FROM 
-    `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}_temp`
+    `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}_temp_{{ task_instance.dag_run.conf.loaded_batch }}`
 WHERE
     is_valid_cstmr_id = true
     AND is_valid_prd_id = true

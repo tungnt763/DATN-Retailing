@@ -58,7 +58,7 @@ def loading_layer(**kwargs):
         gcp_conn_id=_gcp_conn_id,
         bucket=_bucket_name,
         source_objects=[file_path],
-        destination_project_dataset_table=f"{_project_name}.{_dataset_name}.{_table_name}_temp",
+        destination_project_dataset_table=f"{_project_name}.{_dataset_name}.{_table_name}_temp_{{{{ dag_run.conf['loaded_batch'] }}}}",
         schema_fields=_schema_fields_list,
         write_disposition="WRITE_TRUNCATE",
     )
@@ -95,4 +95,4 @@ def loading_layer(**kwargs):
 
     insert_job = insert_job_task.override(task_id=f'insert_loaded_{_table_name}_job_to_log')(gcp_conn_id=_gcp_conn_id, dataset_name=_dataset_name, table_name=_table_name)
 
-    file_path >> max_timestamp >> create_load_dataset >> load_data_to_temp >> dqc >> load_temp_to_table >> drop_staging_temp_table >> insert_job
+    file_path >> max_timestamp >> create_load_dataset >> load_data_to_temp >> load_temp_to_table >> dqc >>  drop_staging_temp_table >> insert_job

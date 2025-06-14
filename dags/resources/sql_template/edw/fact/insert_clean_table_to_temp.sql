@@ -1,4 +1,4 @@
-INSERT INTO `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.output_table }}_temp`
+INSERT INTO `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.output_table }}_temp_{{ task_instance.dag_run.conf.loaded_batch }}`
 SELECT
     {{ params.method_exprs }},
     CURRENT_TIMESTAMP() AS create_date,

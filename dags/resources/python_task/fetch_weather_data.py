@@ -10,6 +10,7 @@ from airflow.decorators import task
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 from airflow.providers.google.cloud.hooks.gcs import GCSHook
 import nest_asyncio
+from datetime import datetime
 nest_asyncio.apply()
 
 # ----------------------------
@@ -140,7 +141,13 @@ def fetch_and_upload_weather_to_gcs(gcp_conn_id, project_name, dataset_name, buc
 
     # Step 4️⃣: Upload lên GCS
     gcs = GCSHook(gcp_conn_id=gcp_conn_id)
-    object_path = f"raw/{table_name}/{table_name}_{context['ts_nodash']}.csv"
+
+    now = datetime.strptime(context['ts_nodash'], '%Y%m%dT%H%M%S')
+    year = now.strftime('%Y')
+    month = now.strftime('%m')
+    day = now.strftime('%d')
+    hour = now.strftime('%H')
+    object_path = f"raw/{table_name}/{year}/{month}/{day}/{hour}/{table_name}_{context['ts_nodash']}.csv"
     gcs.upload(bucket_name=bucket_name, object_name=object_path, filename=tmpfile_path)
     print(f"✅ Uploaded weather file to gs://{bucket_name}/{object_path}")
     os.remove(tmpfile_path)

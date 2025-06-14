@@ -28,6 +28,6 @@ SELECT
         WHEN "1" THEN '{{ task_instance.run_id }}'
         WHEN "0" THEN ARRAY_AGG(update_task_run_id ORDER BY trn_dt_key DESC, trn_hr DESC, flg_if DESC)[ORDINAL(1)]
     END AS update_task_run_id
-FROM `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.output_table }}_temp`
+FROM `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.output_table }}_temp_{{ task_instance.dag_run.conf.loaded_batch }}`
 GROUP BY {{ params.pk_expr }}
     

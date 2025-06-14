@@ -1,4 +1,4 @@
-checks for stores_temp:
+checks for stores:
 - schema:
     fail:
       when required column missing:
@@ -17,12 +17,12 @@ checks for stores_temp:
 - row_count > 0:
     name: stores should contain data
 - failed rows:
-    name: Column count should be exactly 8
+    name: Column count should be exactly 14
     fail query: |-
       SELECT COUNT(*) AS col_count
       FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
-      WHERE table_name = 'stores_temp'
-      HAVING col_count != 8
+      WHERE table_name = 'stores'
+      HAVING col_count != 14
 - missing_count(str_id) = 0:
     name: Store ID must not be null
 - invalid_count(str_emply_num) = 0:

@@ -1,4 +1,4 @@
-checks for products_temp:
+checks for products:
 - schema:
     fail:
       when required column missing:
@@ -22,12 +22,12 @@ checks for products_temp:
 - row_count > 0:
     name: products should contain data
 - failed rows:
-    name: Column count should be exactly 12
+    name: Column count should be exactly 18
     fail query: |-
       SELECT COUNT(*) AS col_count
       FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
-      WHERE table_name = 'products_temp'
-      HAVING col_count != 12
+      WHERE table_name = 'products'
+      HAVING col_count != 18
 - missing_count(prd_id) = 0:
     name: Product ID must not be null
 - missing_count(prd_ctgry) = 0:

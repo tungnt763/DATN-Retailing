@@ -6,6 +6,7 @@ import json
 import os
 import tempfile
 import csv
+from datetime import datetime
 
 @task(provide_context=True)
 def fetch_currency_rates(gcp_conn_id, bucket_name, table_name, base_currency="USD", **context):
@@ -32,7 +33,7 @@ def fetch_currency_rates(gcp_conn_id, bucket_name, table_name, base_currency="US
         # === Build DataFrame ===
         df_rates = pd.DataFrame(rates.items(), columns=["currency_code", "rate_from_base"])
         df_rates["rate_to_usd"] = df_rates["rate_from_base"].apply(
-            lambda x: round(1.0 / x, 6) if base_currency != "USD" else round(x, 6)
+            lambda x: round(1.0 / x, 6)
         )
 
         # === Merge with metadata ===
@@ -56,7 +57,13 @@ def fetch_currency_rates(gcp_conn_id, bucket_name, table_name, base_currency="US
             tmpfile_path = tmpfile.name
 
         gcs = GCSHook(gcp_conn_id=gcp_conn_id)
-        object_path = f"raw/{table_name}/{table_name}_{context['ts_nodash']}.csv"
+
+        now = datetime.strptime(context['ts_nodash'], '%Y%m%dT%H%M%S')
+        year = now.strftime('%Y')
+        month = now.strftime('%m')
+        day = now.strftime('%d')
+        hour = now.strftime('%H')
+        object_path = f"raw/{table_name}/{year}/{month}/{day}/{hour}/{table_name}_{context['ts_nodash']}.csv"
         gcs.upload(bucket_name=bucket_name, object_name=object_path, filename=tmpfile_path)
         print(f"✅ Uploaded {len(df)} currency rates to gs://{bucket_name}/{object_path}")
         os.remove(tmpfile_path)

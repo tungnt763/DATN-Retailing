@@ -1,4 +1,4 @@
-checks for employees_temp:
+checks for employees:
 - schema:
     fail:
       when required column missing:
@@ -11,11 +11,11 @@ checks for employees_temp:
 - row_count > 0:
     name: employees should contain data
 - failed rows:
-    name: Column count should be exactly 4
+    name: Column count should be exactly 10
     fail query: |-
       SELECT COUNT(*) AS col_count
       FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
-      WHERE table_name = 'employees_temp'
-      HAVING col_count != 4
+      WHERE table_name = 'employees'
+      HAVING col_count != 10
 - missing_count(emply_id) = 0:
     name: Employee ID must not be null

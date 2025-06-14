@@ -5,7 +5,7 @@ IF max_timestamp = TIMESTAMP('1900-01-01 00:00:00') THEN
     TRUNCATE TABLE `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.output_table }}`;
 END IF;
 
-INSERT INTO `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.output_table }}_temp`
+INSERT INTO `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.output_table }}_temp_{{ task_instance.dag_run.conf.loaded_batch }}`
 SELECT
     {{ params.col_names }},
     create_date,

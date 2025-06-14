@@ -6,7 +6,7 @@ import yaml
 for DATASET, METADATA in [("edw", "edw_layer_table_info")]:
     METADATA_PATH = f"/Users/tungnt763/Documents/DATN-Retailing/dags/config/{METADATA}.json"
     OUTPUT_DIR = f"/Users/tungnt763/Documents/DATN-Retailing/include/soda/{DATASET}/checks/sources"
-    TABLE_NAME_SUFFIX = "_temp" if DATASET == "edw_loaded" else ""
+    TABLE_NAME_SUFFIX = "" if DATASET == "edw_loaded" else ""
 
     # Load metadata
     with open(METADATA_PATH) as f:
@@ -60,11 +60,11 @@ for DATASET, METADATA in [("edw", "edw_layer_table_info")]:
                 f"SELECT COUNT(*) AS col_count\n"
                 f"FROM `datn-retailing.{DATASET}.INFORMATION_SCHEMA.COLUMNS`\n"
                 f"WHERE table_name = '{table_name}{TABLE_NAME_SUFFIX}'\n"
-                f"HAVING col_count != {int(table_info['col_nums'])}"
+                f"HAVING col_count != {int(table_info['col_nums']) + 6}"
             )
             checks[f"checks for {table_name}{TABLE_NAME_SUFFIX}"].append({
                 "failed rows": {
-                    "name": f"Column count should be exactly {int(table_info['col_nums'])}",
+                    "name": f"Column count should be exactly {int(table_info['col_nums']) + 6}",
                     "fail query": col_count_check
                 }
             })

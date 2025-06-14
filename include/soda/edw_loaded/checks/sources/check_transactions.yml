@@ -1,4 +1,4 @@
-checks for transactions_temp:
+checks for transactions:
 - schema:
     fail:
       when required column missing:
@@ -36,12 +36,12 @@ checks for transactions_temp:
 - row_count > 0:
     name: transactions should contain data
 - failed rows:
-    name: Column count should be exactly 19
+    name: Column count should be exactly 25
     fail query: |-
       SELECT COUNT(*) AS col_count
       FROM `datn-retailing.edw_loaded.INFORMATION_SCHEMA.COLUMNS`
-      WHERE table_name = 'transactions_temp'
-      HAVING col_count != 19
+      WHERE table_name = 'transactions'
+      HAVING col_count != 25
 - missing_count(trn_invc_id) = 0:
     name: Invoice ID must not be null
 - missing_count(trn_line) = 0:

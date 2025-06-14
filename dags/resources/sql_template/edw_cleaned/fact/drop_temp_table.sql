@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}_temp`;
+DROP TABLE IF EXISTS `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.table_name }}_temp_{{ task_instance.dag_run.conf.loaded_batch }}`;

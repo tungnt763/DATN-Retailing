@@ -748,7 +748,7 @@
         "pk": "N",
         "nk": "N",
         "mode": "REQUIRED",
-        "method": "trn_unit_prc",
+        "method": "trn_unit_prc * crncy_rt_usd",
         "other": "",
         "default_value": "0.0"
       },
@@ -760,7 +760,7 @@
         "pk": "N",
         "nk": "N",
         "mode": "REQUIRED",
-        "method": "ROUND(trn_unit_prc * trn_dscnt, 2)",
+        "method": "ROUND(trn_unit_prc * crncy_rt_usd * trn_dscnt, 2)",
         "other": "",
         "default_value": "0.0"
       },
@@ -772,7 +772,7 @@
         "pk": "N",
         "nk": "N",
         "mode": "REQUIRED",
-        "method": "ROUND(trn_unit_prc * (1 - trn_dscnt), 2)",
+        "method": "ROUND(trn_unit_prc * crncy_rt_usd * (1 - trn_dscnt), 2)",
         "other": "",
         "default_value": "0.0"
       },
@@ -784,7 +784,7 @@
         "pk": "N",
         "nk": "N",
         "mode": "REQUIRED",
-        "method": "ROUND(trn_unit_prc * (1 - trn_dscnt) * trn_qty, 2)",
+        "method": "ROUND(trn_unit_prc * crncy_rt_usd * (1 - trn_dscnt) * trn_qty, 2)",
         "other": "",
         "default_value": "0.0"
       },
@@ -796,7 +796,7 @@
         "pk": "N",
         "nk": "N",
         "mode": "REQUIRED",
-        "method": "ROUND(trn_unit_prc * trn_dscnt * trn_qty, 2)",
+        "method": "ROUND(trn_unit_prc * crncy_rt_usd * trn_dscnt * trn_qty, 2)",
         "other": "",
         "default_value": "0.0"
       },
@@ -820,7 +820,7 @@
         "pk": "N",
         "nk": "N",
         "mode": "REQUIRED",
-        "method": "ROUND(trn_unit_prc * (1 - trn_dscnt) * trn_qty - prd_cost * trn_qty, 2)",
+        "method": "ROUND(trn_unit_prc * crncy_rt_usd * (1 - trn_dscnt) * trn_qty - prd_cost * trn_qty, 2)",
         "other": "",
         "default_value": "0.0"
       },
@@ -832,7 +832,7 @@
         "pk": "N",
         "nk": "N",
         "mode": "REQUIRED",
-        "method": "trn_line_ttl",
+        "method": "trn_line_ttl * crncy_rt_usd",
         "other": "",
         "default_value": "0.0"
       },
