@@ -26,7 +26,7 @@ Dự án xây dựng hệ thống end-to-end cho phép:
 
 ## 🏗️ Kiến trúc hệ thống
 
-![Kiến trúc hệ thống](images/architecture.png)
+![Kiến trúc hệ thống](images/architecture.jpeg)
 
 ---
 
@@ -289,6 +289,37 @@ DATN-Retailing/
 ├── Dockerfile
 └── README.md
 ```
+
+---
+
+## 📊 Trực quan hoá dữ liệu
+
+Hệ thống cung cấp các dashboard phân tích hiệu suất kinh doanh theo nhiều khía cạnh khác nhau:
+
+### Dashboard KPI Tổng quan
+![Dashboard KPI Tổng quan](images/DashboardKPI.png)
+![Dashboard KPI Chi tiết](images/DashboardKPI2.png)
+
+### Phân tích Hiệu suất theo Sản phẩm
+Phân tích doanh số, lợi nhuận và xu hướng bán hàng theo từng sản phẩm
+![Phân tích Sản phẩm](images/RetailProducts.png)
+![Phân tích Sản phẩm Chi tiết](images/RetailProducts2.png)
+
+### Phân tích Hiệu suất theo Cửa hàng
+Đánh giá hiệu quả hoạt động của từng cửa hàng, so sánh doanh số và lợi nhuận
+![Phân tích Cửa hàng](images/RetailStores.png)
+
+### Phân tích Tác động của Thời tiết
+Nghiên cứu mối tương quan giữa thời tiết và doanh số bán hàng
+![Phân tích Thời tiết](images/RetailWeather.png)
+![Phân tích Thời tiết Chi tiết](images/RetailWeather2.png)
+
+### Phân tích Khách hàng
+- **Hồ sơ Khách hàng**: Phân tích đặc điểm và hành vi mua sắm của khách hàng
+![Hồ sơ Khách hàng](images/CustomerProfiling.png)
+
+- **Phân khúc Khách hàng**: Phân loại khách hàng theo các nhóm khác nhau để tối ưu chiến lược marketing
+![Phân khúc Khách hàng](images/CustomerSegmentation.png)
 
 ---
 
