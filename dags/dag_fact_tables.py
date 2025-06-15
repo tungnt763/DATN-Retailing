@@ -98,7 +98,7 @@ config = {
     'table_name': _table_name,
     'prefix_name': f'raw/{_table_name}',
 
-    'developer_email': ['waooooo909@gmail.com']
+    'developer_email': ['gnuthanh763@gmail.com', 'waooooo909@gmail.com']
 }
 
 globals()[_dag_id] = create_dag(_dag_id, _schedule, **config)
