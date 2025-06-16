@@ -39,6 +39,7 @@ def create_dag(_dag_id, _schedule, **kwargs):
         start_date=datetime(2023, 1, 1),
         catchup=False,
         default_args=default_args,
+        max_active_runs=1,
         tags=[kwargs.get('table_name')]
     )
     def get_dag():

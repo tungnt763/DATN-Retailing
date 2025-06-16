@@ -15,7 +15,7 @@ SELECT
     create_date AS update_date,
     create_task_id AS update_task_id,
     create_task_run_id AS update_task_run_id
-FROM `{{ params.project_name }}.{{ params.input_dataset }}.{{ params.input_table }}`;
+FROM `{{ params.project_name }}.{{ params.input_dataset }}.{{ params.input_table }}` target;
 
 MERGE `{{ params.project_name }}.{{ params.output_dataset }}.{{ params.output_table }}` AS target
 USING cleaned_data AS source

@@ -277,15 +277,20 @@ def get_edw_expressions_for_table(table_name, metadata_file_name, input_dataset,
     table_info = metadata[table_name]
     columns = table_info["columns"]
 
-    old_columns = ",\n    ".join([col["physical_name"] if col["method"] == "" else f"{col['method']} AS {col['physical_name']}" for col in columns if col["pk"] != "Y"])
+    old_columns = ",\n    ".join([
+        f"target.{col['physical_name']}" if col["nk"] == "Y"
+        else f"{col['physical_name']}" if col["method"] == ""
+        else f"{col['method']} AS {col['physical_name']}"
+        for col in columns if col["pk"] != "Y"
+    ])
     old_columns_in_row = ", ".join([col["physical_name"] for col in columns if col["pk"] != "Y"])
     old_columns_except_method = ",\n    ".join([col["physical_name"] for col in columns if col["pk"] != "Y"])
 
     natural_keys = [col["physical_name"] for col in columns if col["nk"] == "Y"]
     natural_key_expr = "\n    AND ".join([f"target.{nk} = source.{nk}" for nk in natural_keys])
+    natural_key_expr_cte = "\n    AND ".join([f"target.{nk} = e.{nk}" for nk in natural_keys])
 
     columns_except_natural_key_expr = ",\n        ".join([f"{col['physical_name']} = source.{col['physical_name']}" for col in columns if col["pk"] != "Y" and col["nk"] != "Y"])
-
     columns_except_natural_key_equal_expr = "\n    AND ".join([f"target.{col['physical_name']} = source.{col['physical_name']}" for col in columns if col["pk"] != "Y" and col["nk"] != "Y" and col["method"] == ""])
 
     new_columns = ", ".join([col["physical_name"] for col in columns])
@@ -299,7 +304,9 @@ def get_edw_expressions_for_table(table_name, metadata_file_name, input_dataset,
         "old_columns": old_columns,
         "old_columns_in_row": old_columns_in_row,
         "old_columns_except_method": old_columns_except_method,
+        "natural_key": ', '.join(natural_keys),
         "natural_key_expr": natural_key_expr,
+        "natural_key_expr_cte": natural_key_expr_cte,
         "columns_except_natural_key_equal_expr": columns_except_natural_key_equal_expr,
         "columns_except_natural_key_expr": columns_except_natural_key_expr,
         "new_columns": new_columns,
