@@ -16,6 +16,7 @@ include/soda/edw/configuration.yml
 
 superset/*
 !superset/docker-compose-image-tag.yml
+!superset/Dockerfile.bigquery
 spark-jars/
 
 jars.tar.gz

@@ -1,0 +1,29 @@
+FROM apache/superset:4.1.2
+
+USER root
+
+ENV PLAYWRIGHT_BROWSERS_PATH=/usr/local/share/playwright-browsers
+
+# Cài thêm Chrome dependencies + chromedriver
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libnss3 libgconf-2-4 libxi6 libxcursor1 libxss1 libxtst6 libxrandr2 \
+    libasound2 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libgbm1 \
+    libgtk-3-0 ca-certificates fonts-liberation libappindicator3-1 \
+    lsb-release xdg-utils wget unzip chromium-driver && \
+    rm -rf /var/lib/apt/lists/*
+
+# Cài thư viện Python + Playwright + BQ
+RUN pip install --no-cache-dir \
+    numpy==1.24.4 \
+    sqlalchemy-bigquery \
+    psycopg2-binary \
+    google-cloud-bigquery[pandas] \
+    google-cloud-bigquery-storage \
+    Authlib \
+    playwright && \
+    PLAYWRIGHT_BROWSERS_PATH=/usr/local/share/playwright-browsers playwright install chromium
+
+USER superset
+
+CMD ["/app/docker/entrypoints/run-server.sh"]
